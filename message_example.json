@@ -1,0 +1,23 @@
+{
+    "update_id": 157861985,
+    "message": {
+        "message_id": 10,
+        "from": {
+            "id": 1040023542,
+            "is_bot": false,
+            "first_name": "DZMITRY",
+            "last_name": "DRAZDOU",
+            "username": "dzmitrydrazdou",
+            "language_code": "en"
+        },
+        "chat": {
+            "id": 1040023542,
+            "first_name": "DZMITRY",
+            "last_name": "DRAZDOU",
+            "username": "dzmitrydrazdou",
+            "type": "private"
+        },
+        "date": 1627308878,
+        "text": "/start"
+    }
+}
