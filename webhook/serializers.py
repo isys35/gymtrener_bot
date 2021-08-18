@@ -14,6 +14,15 @@ class MessageSerializer(serializers.Serializer):
     message_id = serializers.IntegerField()
     date = serializers.DateTimeField()
     text = serializers.CharField()
+    user = UserSerializer(source='from')
+
+
+class ChatSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    username = serializers.CharField()
+    type = serializers.CharField()
 
 
 class UpdateSerializer(serializers.Serializer):
