@@ -12,9 +12,14 @@ class UserSerializer(serializers.Serializer):
 
 class MessageSerializer(serializers.Serializer):
     message_id = serializers.IntegerField()
-    date = serializers.DateTimeField()
+    date = serializers.IntegerField()
     text = serializers.CharField()
-    user = UserSerializer(source='from')
+    user = UserSerializer()
+
+    def to_internal_value(self, data):
+        if data['from']:
+            data['user'] = data['from']
+        return super(MessageSerializer, self).to_internal_value(data)
 
 
 class ChatSerializer(serializers.Serializer):
