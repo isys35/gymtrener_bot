@@ -14,6 +14,20 @@ class TelegramContext:
         """
         self.bot = telebot.TeleBot(token, threaded=False)
 
+    @staticmethod
+    def get_keyboard(buttons: list) -> telebot.types.ReplyKeyboardMarkup:
+        """
+        Создает и возвращает клавиатуру
+        для показа пользователю в Telegram
+        :param buttons: список с кнопками
+        :return: telebot.types.ReplyKeyboardMarkup
+        """
+        markup = telebot.types.ReplyKeyboardMarkup(row_width=1,
+                                                   resize_keyboard=True)
+        for row in buttons:
+            markup.row(*row)
+        return markup
+
     def send_message(self,
                      receiver: int,
                      text: str,
@@ -40,3 +54,4 @@ class TelegramContext:
     def get_user(update: UpdateSerializer):
         user = User(update)
         user.init_from_update()
+        return user

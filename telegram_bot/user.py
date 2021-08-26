@@ -11,6 +11,6 @@ class User:
         self.update = update
 
     def init_from_update(self):
-        self.id = int(self.update.message.user.id)
-        self.full_request = self.update.message.text
+        self.id = self.update.data['message']['user']['id']
+        self.full_request = self.update.data['message']['text']
         return True
