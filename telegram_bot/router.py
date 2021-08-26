@@ -77,7 +77,7 @@ class Router:
     def url_dispatcher(self, bot):
         view = self.static_urls.get(bot.user.full_request)
         if view is not None:
-            await view(bot)
+            view(bot)
         else:
             result = {}
             for dynamic_url in self.dynamic_urls:
@@ -87,4 +87,4 @@ class Router:
                     view = dynamic_url[1]
                     break
             if view:
-                await view(bot, **result.groupdict())
+                view(bot, **result.groupdict())

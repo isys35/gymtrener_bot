@@ -1,8 +1,3 @@
-import math
-
-from telebot import types
-
-
 class State:
     __state = None
 

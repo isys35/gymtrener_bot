@@ -39,4 +39,4 @@ class TelegramContext:
     @staticmethod
     def get_user(update: UpdateSerializer):
         user = User(update)
-        user.from_update()
+        user.init_from_update()
