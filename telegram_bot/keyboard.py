@@ -31,6 +31,9 @@ def keyboard(method):
 class BotKeyboard(State):
     kb_data = None
 
+    def __init__(self, context):
+        State.__init__(self, context)
+
     def row(self, *args):
         button_row = [*args]
         self.kb_data.append(button_row)

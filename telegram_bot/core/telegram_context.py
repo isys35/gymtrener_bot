@@ -1,5 +1,8 @@
 import telebot
 
+from telegram_bot.user import User
+from webhook.serializers import UpdateSerializer
+
 
 class TelegramContext:
     bot = None
@@ -32,3 +35,8 @@ class TelegramContext:
             'timeout': 1
         }
         self.bot.send_message(**kwargs)
+
+    @staticmethod
+    def get_user(update: UpdateSerializer):
+        user = User(update)
+        user.from_update()
