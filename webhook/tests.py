@@ -1,3 +1,5 @@
 from django.test import TestCase
 
-# Create your tests here.
+class BotMock:
+    def send_message(**kwargs):
+        pass
