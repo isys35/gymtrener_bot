@@ -3,6 +3,29 @@ from telegram_bot.keyboard import BotKeyboard
 from webhook.serializers import UpdateSerializer
 
 
+def save_state(state: str = '/'):
+    """
+    Декоратор для сохранения состояния пользователя после
+    выполнения запроса.
+    Если state не передается, то сохраняет корневое состояние.
+    :param state: str
+    :return: _save_state (wrapper)
+    """
+
+    def _save_state(function):
+        """
+        Выполняет запрос, после сохраняет стейт
+        :param function:
+        :return: wrapper
+        """
+        def wrapper(bot, **kwargs):
+            function(bot, **kwargs)
+            bot.user.save_state(state)
+        return wrapper
+
+    return _save_state
+
+
 class Bot:
     context = None
     user = None

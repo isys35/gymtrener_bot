@@ -55,7 +55,7 @@ class UserModelTest(TestCase):
         user = User(self.update)
         user.init_from_update()
         self.assertEqual(0, user.id)
-        self.assertEqual('TEST', user.full_request)
+        self.assertEqual('test', user.request)
         self.assertEqual(self.update, user.update)
         self.assertEqual('/', user.state)
         self.assertEqual(True, user.initialized)
@@ -72,10 +72,17 @@ class UserModelTest(TestCase):
         user.initialized = False
         user.init_from_db()
         self.assertEqual(0, user.id)
-        self.assertEqual('TEST', user.full_request)
+        self.assertEqual('test', user.request)
         self.assertEqual(self.update, user.update)
         self.assertEqual('/', user.state)
         self.assertEqual(True, user.initialized)
+
+    def test_save_state(self):
+        user = User(self.update)
+        user.init_from_update()
+        user.save_state('/тестовое состояние')
+        tg_user = TelegramUser.objects.get(id=0)
+        self.assertEqual('/тестовое состояние', tg_user.state)
 
 
 class RouterTest(TestCase):

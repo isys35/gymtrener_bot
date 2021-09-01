@@ -1,5 +1,5 @@
 from telegram_bot.views import welcome
 
 urls = [
-    (r'/start', welcome),
+    (r'<wc:req>/start', welcome),
     ]

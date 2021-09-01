@@ -5,6 +5,7 @@ class TelegramUser(models.Model):
     first_name = models.CharField(max_length=100, db_index=True)
     last_name = models.CharField(max_length=100, db_index=True, blank=True, default=None)
     username = models.CharField(max_length=100, db_index=True, default=None)
+    state = models.CharField(max_length=200, default='/')
 
 
 class TelegramMessage(models.Model):
