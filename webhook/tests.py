@@ -1,8 +1,10 @@
 from django.test import TestCase
 
+from telegram_bot.core.telegram_context import TelegramContext
+from telegram_bot.keyboard import BotKeyboard
 from telegram_bot.router import ReFormat, Router
 from telegram_bot.user import User
-from telegram_bot.views import welcome
+from telegram_bot.views import welcome, select_category
 from webhook.models import TelegramUser, TelegramMessage
 
 
@@ -10,10 +12,19 @@ class KeyboardMock:
     def main(self):
         return
 
+    def categories(self, categories_list):
+        return
+
+
+class UserMock:
+    def save_state(self, new_state=None):
+        pass
+
 
 class BotMock:
-    keyboard = KeyboardMock()
+    keyboard = BotKeyboard(TelegramContext('token'))
     text_message = None
+    user = UserMock()
 
     def send_message(self, text, keyboard):
         self.text_message = text
@@ -36,7 +47,7 @@ class UpdateMock:
     }
 
 
-class WelcomeViewTest(TestCase):
+class ViewsTest(TestCase):
 
     def setUp(self) -> None:
         self.bot = BotMock()
@@ -44,7 +55,12 @@ class WelcomeViewTest(TestCase):
     def test_welcome(self):
         welcome(self.bot)
         text_message = self.bot.text_message
-        self.assertEqual("Привет мир", text_message)
+        self.assertEqual("%ПРИВЕТСТВИЕ%", text_message)
+
+    def test_select_categories(self):
+        select_category(self.bot)
+        text_message = self.bot.text_message
+        self.assertEqual("Выберите категорию упражнений", text_message)
 
 
 class UserModelTest(TestCase):

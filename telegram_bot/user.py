@@ -25,7 +25,7 @@ class User:
 
     def save_message(self):
         message = TelegramMessage(message_id=self.update.data['message']['message_id'],
-                                  text=self.full_request,
+                                  text=self.update.data['message']['text'],
                                   user_id=self.id)
         message.save()
 
