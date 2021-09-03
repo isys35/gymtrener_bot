@@ -28,3 +28,9 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+
+
+class Exersice(models.Model):
+    title = models.CharField(max_length=100, db_index=True, unique=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
+    description = models.TextField(blank=True, default=None)
