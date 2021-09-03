@@ -54,3 +54,7 @@ class BotKeyboard(State):
         self.row('🏠 Главное меню')
         for category in categories_list:
             self.row(str(category))
+
+    @keyboard
+    def exercises(self):
+        self.row('🏠 Главное меню')
