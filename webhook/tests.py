@@ -4,8 +4,8 @@ from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.keyboard import BotKeyboard
 from telegram_bot.router import ReFormat, Router
 from telegram_bot.user import User
-from telegram_bot.views import welcome, select_category
-from webhook.models import TelegramUser, TelegramMessage
+from telegram_bot.views import welcome, select_category, select_exercise
+from webhook.models import TelegramUser, TelegramMessage, Exersice, Category
 
 
 class KeyboardMock:
@@ -60,7 +60,18 @@ class ViewsTest(TestCase):
     def test_select_categories(self):
         select_category(self.bot)
         text_message = self.bot.text_message
-        self.assertEqual("Выберите категорию упражнений", text_message)
+        self.assertEqual("В базе нету упражнений 😔", text_message)
+
+    def test_select_exercises(self):
+        select_exercise(self.bot, 'грудь')
+        text_message = self.bot.text_message
+        self.assertEqual("В базе нету упражнений 😔", text_message)
+        Category.objects.create(title='грудь')
+        Exersice.objects.create(title='Жим', category_id=1, description='Описание')
+        select_exercise(self.bot, 'грудь')
+        text_message = self.bot.text_message
+        self.assertEqual("\n    1 - Жим\n", text_message)
+
 
 
 class UserModelTest(TestCase):
