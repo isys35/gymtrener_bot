@@ -47,4 +47,14 @@ class BotKeyboard(State):
         Функция генерации клавиатуры главного меню.
         :return: None
         """
-        self.row('\U0001F4B1 Кнопка', '\U0001F4B3 Кнопка')
+        self.row('💪🏻 Выбрать упражнение')
+
+    @keyboard
+    def categories(self, categories_list):
+        self.row('🏠 Главное меню')
+        for category in categories_list:
+            self.row(str(category))
+
+    @keyboard
+    def exercises(self):
+        self.row('🏠 Главное меню')

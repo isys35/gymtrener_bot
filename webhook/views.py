@@ -25,4 +25,4 @@ class WebHook(APIView):
         bot = Bot(telegram_context, serializer)
         router = Router(urls)
         router.url_dispatcher(bot)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"success": True}, status=status.HTTP_200_OK)
