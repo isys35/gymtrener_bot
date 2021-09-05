@@ -1,3 +1,6 @@
+from telebot import types
+
+
 class State:
     __state = None
 
@@ -55,6 +58,8 @@ class BotKeyboard(State):
         for category in categories_list:
             self.row(str(category))
 
-    @keyboard
-    def exercises(self):
-        self.row('🏠 Главное меню')
+    def exercises(self) -> types.InlineKeyboardMarkup:
+        markup = types.InlineKeyboardMarkup()
+        btn = types.InlineKeyboardButton(text="1", callback_data="1")
+        markup.add(btn)
+        return markup

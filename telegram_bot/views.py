@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from telegram_bot.bot import save_state, Bot
 from webhook.models import Category, Exersice
 
+
 @save_state("/")
 def welcome(bot, **kwargs):
     text_message = "%ПРИВЕТСТВИЕ%"
