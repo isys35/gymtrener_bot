@@ -5,9 +5,9 @@ class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     is_bot = serializers.BooleanField()
     first_name = serializers.CharField()
-    last_name = serializers.CharField()
+    last_name = serializers.CharField(default=None)
     username = serializers.CharField()
-    language_code = serializers.CharField()
+    language_code = serializers.CharField(default=None)
 
 
 class InlineKeyboardSerializer(serializers.Serializer):
@@ -16,7 +16,12 @@ class InlineKeyboardSerializer(serializers.Serializer):
 
 
 class ReplyMarkUpSerializer(serializers.Serializer):
-    inline_keyboard = InlineKeyboardSerializer(many=True)
+    inline_keyboard = serializers.ListField(
+        child=serializers.ListField(
+            child=InlineKeyboardSerializer(
+            )
+        )
+    )
 
 
 class MessageSerializer(serializers.Serializer):
