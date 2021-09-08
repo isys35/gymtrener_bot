@@ -58,8 +58,11 @@ class BotKeyboard(State):
         for category in categories_list:
             self.row(str(category))
 
-    def exercises(self) -> types.InlineKeyboardMarkup:
+    def exercises(self, exersices) -> types.InlineKeyboardMarkup:
         markup = types.InlineKeyboardMarkup()
-        btn = types.InlineKeyboardButton(text="1", callback_data="1")
-        markup.add(btn)
+        btn_list = []
+        for exersice in exersices:
+            btn = types.InlineKeyboardButton(text=exersice.id, callback_data=exersice.id)
+            btn_list.append(btn)
+        markup.add(*btn_list)
         return markup

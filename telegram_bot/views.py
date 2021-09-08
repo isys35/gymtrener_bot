@@ -26,5 +26,5 @@ def select_exercise(bot: Bot, category: str):
         return
     context = {'exersices': exersices}
     message = render_to_string('exercises.html', context=context)
-    bot.send_message(message, bot.keyboard.exercises())
+    bot.send_message(message, bot.keyboard.exercises(exersices))
     bot.user.save_state(f'/выбрать упражнение/{category}')
