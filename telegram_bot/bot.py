@@ -18,9 +18,11 @@ def save_state(state: str = '/'):
         :param function:
         :return: wrapper
         """
+
         def wrapper(bot, **kwargs):
             function(bot, **kwargs)
             bot.user.save_state(state)
+
         return wrapper
 
     return _save_state
@@ -37,7 +39,12 @@ class Bot:
         self.update = update
         self.user = self.context.get_user(update)
 
-    def send_message(self, text, markup=True):
+    def send_message(self, text: str, markup=True):
         return self.context.send_message(self.user.id,
                                          text,
                                          markup)
+
+    def edit_message(self, text: str, message_id: int):
+        return self.context.edit_message(self.user.id,
+                                         text,
+                                         message_id)

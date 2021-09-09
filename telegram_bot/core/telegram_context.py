@@ -50,6 +50,14 @@ class TelegramContext:
         }
         self.bot.send_message(**kwargs)
 
+    def edit_message(self, receiver: int, text: str, message_id: int):
+        kwargs = {
+            'chat_id': receiver,
+            'text': text,
+            'message_id': message_id
+        }
+        self.bot.edit_message_text(**kwargs)
+
     @staticmethod
     def get_user(update: UpdateSerializer):
         user = User(update)
