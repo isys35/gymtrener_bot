@@ -70,8 +70,7 @@ class ViewsTest(TestCase):
         Exersice.objects.create(title='Жим', category_id=1, description='Описание')
         select_exercise(self.bot, 'грудь')
         text_message = self.bot.text_message
-        self.assertEqual("\n    1 - Жим\n", text_message)
-
+        self.assertEqual("\n1 - Жим\n", text_message)
 
 
 class UserModelTest(TestCase):
