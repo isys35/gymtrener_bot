@@ -26,3 +26,7 @@ class HandlerInterface(ABC):
     @abstractmethod
     def get_message_id(self):
         pass
+
+    @abstractmethod
+    def get_callback(self):
+        pass

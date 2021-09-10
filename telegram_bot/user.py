@@ -19,6 +19,7 @@ class User:
     full_request = None
     request = None
     state = '/'
+    callback = None
 
     def __init__(self, update: UpdateSerializer):
         self.update = update
@@ -45,6 +46,7 @@ class User:
             self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
         elif self.update_handler == "callback":
             self.request = 'callback'
+            self.callback = self.update_handler.get_callback()
         if self.request == '':
             self.full_request = self.state
         elif self.state == '/':

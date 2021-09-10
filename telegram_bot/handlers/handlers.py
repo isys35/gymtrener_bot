@@ -25,6 +25,9 @@ class MessageHandler(HandlerInterface):
     def get_message_id(self):
         return self.update.data['message'].get('message_id')
 
+    def get_callback(self):
+        return None
+
 
 class CallBackHandler(HandlerInterface):
 
@@ -48,6 +51,9 @@ class CallBackHandler(HandlerInterface):
 
     def get_message_id(self):
         return self.update.data['callback_query']['message'].get('message_id')
+
+    def get_callback(self):
+        return self.update.data['callback_query'].get('data')
 
 
 class UpdateHandler(HandlerInterface):
@@ -78,3 +84,6 @@ class UpdateHandler(HandlerInterface):
 
     def get_message_id(self):
         return self.handler.get_message_id()
+
+    def get_callback(self):
+        return self.handler.get_callback()
