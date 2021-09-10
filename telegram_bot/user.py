@@ -21,6 +21,7 @@ class User:
     state = '/'
 
     def __init__(self, update: UpdateSerializer):
+        self.update = update
         self.update_handler = UpdateHandler(update)
         self.initialized = False
 

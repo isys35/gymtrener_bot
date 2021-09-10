@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from telegram_bot.core.telegram_context import TelegramContext
+from telegram_bot.handlers.handlers import UpdateHandler
 from telegram_bot.keyboard import BotKeyboard
 from telegram_bot.router import ReFormat, Router
 from telegram_bot.user import User
@@ -30,7 +31,7 @@ class BotMock:
         self.text_message = text
 
 
-class UpdateMock:
+class UpdateMockMessage:
     data = {
         'message':
             {
@@ -43,7 +44,52 @@ class UpdateMock:
                         'username': 'test_username'
                     },
                 'text': 'TEST'
-            }
+            },
+    }
+
+
+class UpdateMockCallback:
+    data = {
+        "update_id": 416435499,
+        "callback_query": {
+            "id": "4466867100678531890",
+            "user": {
+                "id": 1040023542,
+                "is_bot": False,
+                "first_name": "Dzmitry",
+                "username": "dzmitrydrazdou",
+                "language_code": "ru"
+            },
+            "message": {
+                "message_id": 412,
+                "user": {
+                    "id": 1462806763,
+                    "is_bot": False,
+                    "first_name": "trener_bot",
+                    "username": "personal_trener_bot"
+                },
+                "chat": {
+                    "id": 1040023542,
+                    "first_name": "Dzmitry",
+                    "username": "dzmitrydrazdou",
+                    "type": "private"
+                },
+                "date": 1630847814,
+                "text": "TEST",
+                "reply_markup": {
+                    "inline_keyboard": [
+                        [
+                            {
+                                "text": "1",
+                                "callback_data": "1"
+                            }
+                        ]
+                    ]
+                }
+            },
+            "chat_instance": "1054847050213324649",
+            "data": "1"
+        }
     }
 
 
@@ -75,7 +121,7 @@ class ViewsTest(TestCase):
 
 class UserModelTest(TestCase):
     def setUp(self) -> None:
-        self.update = UpdateMock()
+        self.update = UpdateMockMessage()
 
     def test_init_from_update(self):
         user = User(self.update)
@@ -142,3 +188,27 @@ class RouterTest(TestCase):
         self.assertEqual('start', router.static_urls['/start'])
         self.assertEqual('test', router.static_urls['/test'])
         self.assertEqual(('(?P<req>.*)/start', 'dinamyc_start'), router.dynamic_urls[0])
+
+
+class HandlersrsTest(TestCase):
+    def setUp(self) -> None:
+        self.update_message = UpdateMockMessage()
+        self.update_callback = UpdateMockCallback()
+
+    def test_update_handler_message(self):
+        update_handler = UpdateHandler(self.update_message)
+        self.assertEqual(0, update_handler.get_user_id())
+        self.assertEqual('test_first_name', update_handler.get_first_name())
+        self.assertEqual('test_last_name', update_handler.get_last_name())
+        self.assertEqual('test_username', update_handler.get_username())
+        self.assertEqual('TEST', update_handler.get_text())
+        self.assertEqual(0, update_handler.get_message_id())
+
+    def test_update_handler_callback(self):
+        update_handler = UpdateHandler(self.update_callback)
+        self.assertEqual(1040023542, update_handler.get_user_id())
+        self.assertEqual('Dzmitry', update_handler.get_first_name())
+        self.assertEqual(None, update_handler.get_last_name())
+        self.assertEqual('dzmitrydrazdou', update_handler.get_username())
+        self.assertEqual(None, update_handler.get_text())
+        self.assertEqual(412, update_handler.get_message_id())
