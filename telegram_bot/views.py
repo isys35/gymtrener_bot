@@ -5,13 +5,13 @@ from webhook.models import Category, Exersice
 
 
 @save_state("/")
-def welcome(bot, **kwargs):
+def welcome(bot: Bot, **kwargs):
     text_message = "%ПРИВЕТСТВИЕ%"
     bot.send_message(text_message, bot.keyboard.main())
 
 
 @save_state("/выбрать упражнение")
-def select_category(bot):
+def select_category(bot: Bot):
     categories = Category.objects.all()
     if not categories:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
@@ -30,9 +30,9 @@ def select_exercise(bot: Bot, category: str):
     bot.user.save_state(f'/выбрать упражнение/{category}')
 
 
-def exercise_info(bot: Bot, message_id: int, exercise_id: int):
-    exercise = Exersice.objects.get(id=exercise_id)
+def exercise_info(bot: Bot, **kwargs):
+    exercise = Exersice.objects.get(id=bot.user.callback)
     context = {'exercise': exercise}
     message = render_to_string('exercise.html', context=context)
-    bot.edit_message(message, message_id)
+    bot.edit_message(message, bot.user.update_handler.get_message_id())
     bot.user.save_state()

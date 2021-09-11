@@ -44,7 +44,7 @@ class User:
         if self.update_handler.type == "message":
             reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
             self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
-        elif self.update_handler == "callback":
+        elif self.update_handler.type == "callback":
             self.request = 'callback'
             self.callback = self.update_handler.get_callback()
         if self.request == '':
