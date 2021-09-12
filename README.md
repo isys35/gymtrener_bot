@@ -1,1 +1,0 @@
-# gymtrener_bot
