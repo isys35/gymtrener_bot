@@ -6,8 +6,8 @@ from webhook.models import Category, Exersice
 
 @save_state("/")
 def welcome(bot: Bot, **kwargs):
-    text_message = "%ПРИВЕТСТВИЕ%"
-    bot.send_message(text_message, bot.keyboard.main())
+    message = render_to_string('welcome.html')
+    bot.send_message(message, bot.keyboard.main())
 
 
 @save_state("/выбрать упражнение")
