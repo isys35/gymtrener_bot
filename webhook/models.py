@@ -22,6 +22,10 @@ class ChatSerializer(models.Model):
 class Category(models.Model):
     title = models.CharField(max_length=100, db_index=True, unique=True)
 
+    def save(self, *args, **kwargs):
+        self.title = self.title.lower()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.title}"
 
