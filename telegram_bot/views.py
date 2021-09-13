@@ -24,6 +24,8 @@ def select_category(bot: Bot, **kwargs):
 def select_exercise(bot: Bot, category: str, page_number=None):
     if page_number is None:
         page = 1
+    else:
+        page = int(page_number)
     exersices = Exersice.objects.filter(category__title=category).order_by('id')
     if not exersices:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
@@ -32,12 +34,22 @@ def select_exercise(bot: Bot, category: str, page_number=None):
     context = {'exersices': paginator.page(page)}
     message = render_to_string('exercises.html', context=context)
     bot.send_message(message, bot.keyboard.exercises(paginator.page(page)))
-    bot.user.save_state(f'/выбрать упражнение/{category}')
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page}')
 
 
-def exercise_info(bot: Bot):
-    exercise = Exersice.objects.get(id=bot.user.callback)
+def next_page_exercise(bot: Bot, category: str, page_number):
+    page = int(page_number) + 1
+    select_exercise(bot, category, page)
+
+
+def previos_page_exercis(bot: Bot, category: str, page_number):
+    page = int(page_number) - 1
+    select_exercise(bot, category, page)
+
+
+def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
+    exercise = Exersice.objects.get(id=int(exercise_id))
     context = {'exercise': exercise}
     message = render_to_string('exercise.html', context=context)
-    bot.edit_message(message, bot.user.update_handler.get_message_id())
+    bot.send_message(message, bot.keyboard.exercise())
     bot.user.save_state()
