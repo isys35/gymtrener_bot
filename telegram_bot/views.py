@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 
 from telegram_bot.bot import save_state, Bot
-from webhook.models import Category, Exersice
+from webhook.models import Category, Exersice, ExerciseUse, Set
 
 
 @save_state("/")
@@ -21,7 +21,7 @@ def select_category(bot: Bot, **kwargs):
     bot.send_message("Выберите категорию упражнений", bot.keyboard.categories(categories))
 
 
-def select_exercise(bot: Bot, category: str, page_number=None):
+def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
     if page_number is None:
         page = 1
     else:
@@ -53,3 +53,14 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
     message = render_to_string('exercise.html', context=context)
     bot.send_message(message, bot.keyboard.exercise())
     bot.user.save_state()
+
+
+def exercise_use(bot: Bot, category: str, page_number: str, exercise_id: str, exercise_use_id=None):
+    if not exercise_use_id:
+        exercise_use = ExerciseUse.objects.create(exercise_id=int(exercise_id), user_id=bot.user.id)
+        exercise_set = Set.objects.create(exercise_use=exercise_use)
+    else:
+        pass
+    context = {'set_count': exercise_set.count_index}
+    message = render_to_string('exercise_use.html', context=context)
+    bot.send_message(message, bot.keyboard.exercise_use())
