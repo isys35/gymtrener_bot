@@ -64,3 +64,10 @@ def exercise_use(bot: Bot, category: str, page_number: str, exercise_id: str, ex
     context = {'set_count': exercise_set.count_index}
     message = render_to_string('exercise_use.html', context=context)
     bot.send_message(message, bot.keyboard.exercise_use())
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/выполнить упражнение/{exercise_use.id}')
+
+
+@save_state("/")
+def close_exercise(bot: Bot, category: str, page_number: str, exercise_id: str, exercise_use_id: str):
+    text = 'Вы завершили упражнение, вот статистика бла бла бла'
+    bot.send_message(text, bot.keyboard.main())

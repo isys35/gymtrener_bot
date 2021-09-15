@@ -51,7 +51,7 @@ class ExerciseUse(models.Model):
 
 
 class Set(models.Model):
-    exercise = models.ForeignKey(ExerciseUse, on_delete=models.CASCADE, related_name='sets')
+    exercise_use = models.ForeignKey(ExerciseUse, on_delete=models.CASCADE, related_name='sets')
     count_index = models.IntegerField(default=1)
     repeat = models.IntegerField(default=0)
     mass = models.IntegerField(default=0)
