@@ -1,5 +1,5 @@
-from django.core.paginator import Paginator, Page
-from telebot import types
+from django.core.paginator import Page
+from telebot.types import ReplyKeyboardRemove
 
 
 class State:
@@ -83,7 +83,9 @@ class BotKeyboard(State):
         self.row('❌ Закончить упражнение')
 
     def clear_keyboard(self):
-        pass
+        return ReplyKeyboardRemove()
+
+
     # def exercises(self, exersices) -> types.InlineKeyboardMarkup:
     #     markup = types.InlineKeyboardMarkup()
     #     btn_list = []
