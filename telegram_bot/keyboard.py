@@ -82,6 +82,8 @@ class BotKeyboard(State):
         self.row('Продолжить ➡')
         self.row('❌ Закончить упражнение')
 
+    def clear_keyboard(self):
+        pass
     # def exercises(self, exersices) -> types.InlineKeyboardMarkup:
     #     markup = types.InlineKeyboardMarkup()
     #     btn_list = []

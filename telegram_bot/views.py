@@ -1,6 +1,8 @@
+import telebot
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
+from telebot.types import ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 from telegram_bot.bot import save_state, Bot
 from webhook.models import Category, Exersice, ExerciseUse, Set
@@ -71,3 +73,14 @@ def exercise_use(bot: Bot, category: str, page_number: str, exercise_id: str, ex
 def close_exercise(bot: Bot, category: str, page_number: str, exercise_id: str, exercise_use_id: str):
     text = 'Вы завершили упражнение, вот статистика бла бла бла'
     bot.send_message(text, bot.keyboard.main())
+
+
+def input_mass(bot: Bot, category: str, page_number: str, exercise_id: str, exercise_use_id: str):
+    text = 'Введите массу'
+    bot.send_message(text, ReplyKeyboardRemove())
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/выполнить упражнение/{exercise_id}/input_mass')
+
+
+def input_repeat(bot: Bot, category: str, page_number: str, exercise_id: str, exercise_use_id: str, mass: str):
+    text = 'Введите кол-во повторений'
+    bot.send_message(text, ReplyKeyboardRemove())
