@@ -29,6 +29,7 @@ def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
     exersices = Exersice.objects.filter(category__title=category).order_by('id')
     if not exersices:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
+        bot.user.save_state()
         return
     paginator = Paginator(exersices, settings.PAGINATOR_SIZE)
     context = {'exersices': paginator.page(page)}
@@ -56,6 +57,7 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
 
 
 def exercise_use(bot: Bot, **kwargs):
+    # TODO: Добавить логику в случае если нету упражнений в базе!
     exercise_use_id = kwargs.get('exercise_use_id')
     exercise_id = kwargs.get('exercise_id')
     if not exercise_use_id:
