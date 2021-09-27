@@ -1,5 +1,7 @@
 import re
 
+from telegram_bot.bot import Bot
+
 
 class ReFormat:
     VAR_NAME = r'[_a-zA-Z][_a-zA-Z0-9]*'
@@ -74,10 +76,11 @@ class Router:
             else:
                 self.dynamic_urls.append((url_after_re, url[1]))
 
-    def url_dispatcher(self, bot):
+    def url_dispatcher(self, bot: Bot):
         view = self.static_urls.get(bot.user.full_request)
         if view is not None:
-            view(bot)
+             view(bot)
+             return
         else:
             result = {}
             for dynamic_url in self.dynamic_urls:
@@ -88,3 +91,6 @@ class Router:
                     break
             if view:
                 view(bot, **result.groupdict())
+                return
+        bot.error_404()
+

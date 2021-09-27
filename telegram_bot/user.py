@@ -1,5 +1,6 @@
 import re
 
+from telegram_bot.handlers.handlers import UpdateHandler
 from webhook.models import TelegramUser, TelegramMessage
 from webhook.serializers import UpdateSerializer
 
@@ -18,27 +19,34 @@ class User:
     full_request = None
     request = None
     state = '/'
+    callback = None
 
     def __init__(self, update: UpdateSerializer):
         self.update = update
+        self.update_handler = UpdateHandler(update)
         self.initialized = False
 
     def save_message(self):
-        message = TelegramMessage(message_id=self.update.data['message']['message_id'],
-                                  text=self.update.data['message']['text'],
-                                  user_id=self.id)
-        message.save()
+        if self.update_handler.type == "message":
+            message = TelegramMessage(message_id=self.update_handler.get_message_id(),
+                                      text=self.update_handler.get_text(),
+                                      user_id=self.id)
+            message.save()
 
     def create_user(self):
         tg_user = TelegramUser(id=self.id,
-                               first_name=self.update.data['message']['user'].get('first_name'),
-                               last_name=self.update.data['message']['user'].get('last_name'),
-                               username=self.update.data['message']['user'].get('username'))
+                               first_name=self.update_handler.get_first_name(),
+                               last_name=self.update_handler.get_last_name(),
+                               username=self.update_handler.get_username())
         tg_user.save()
 
     def _init_request(self):
-        reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
-        self.request = reg.sub(' ', self.update.data['message']['text']).strip().lower()
+        if self.update_handler.type == "message":
+            reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
+            self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
+        elif self.update_handler.type == "callback":
+            self.request = 'callback'
+            self.callback = self.update_handler.get_callback()
         if self.request == '':
             self.full_request = self.state
         elif self.state == '/':
@@ -48,13 +56,13 @@ class User:
 
     @initialized
     def init_from_update(self):
-        self.id = self.update.data['message']['user']['id']
+        self.id = self.update_handler.get_user_id()
         self._init_request()
         self.create_user()
         self.save_message()
 
     def init_from_db(self):
-        tg_user = TelegramUser.objects.filter(id=self.update.data['message']['user']['id'])
+        tg_user = TelegramUser.objects.filter(id=self.update_handler.get_user_id())
         if tg_user:
             tg_user = tg_user.first()
             self.id = tg_user.id

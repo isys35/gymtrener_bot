@@ -22,6 +22,10 @@ class ChatSerializer(models.Model):
 class Category(models.Model):
     title = models.CharField(max_length=100, db_index=True, unique=True)
 
+    def save(self, *args, **kwargs):
+        self.title = self.title.lower()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.title}"
 
@@ -37,3 +41,17 @@ class Exersice(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+
+class ExerciseUse(models.Model):
+    exercise = models.ForeignKey(Exersice, on_delete=models.CASCADE)
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
+    date_start = models.DateTimeField(auto_created=True, blank=True, null=True)
+    date_finish = models.DateTimeField(blank=True, null=True, default=None)
+
+
+class Set(models.Model):
+    exercise_use = models.ForeignKey(ExerciseUse, on_delete=models.CASCADE, related_name='sets')
+    count_index = models.IntegerField(default=1)
+    repeat = models.IntegerField(default=0)
+    mass = models.IntegerField(default=0)

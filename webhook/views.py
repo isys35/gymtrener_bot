@@ -21,6 +21,8 @@ class WebHook(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        if not serializer.data.get('message') and not serializer.data.get('callback_query'):
+            return Response({"success": False, 'error':'Not message' }, status=status.HTTP_400_BAD_REQUEST)
         telegram_context = TelegramContext(settings.TELEGRAM_TOKEN)
         bot = Bot(telegram_context, serializer)
         router = Router(urls)

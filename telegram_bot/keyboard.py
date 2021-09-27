@@ -1,3 +1,7 @@
+from django.core.paginator import Page
+from telebot.types import ReplyKeyboardRemove
+
+
 class State:
     __state = None
 
@@ -53,8 +57,40 @@ class BotKeyboard(State):
     def categories(self, categories_list):
         self.row('🏠 Главное меню')
         for category in categories_list:
-            self.row(str(category))
+            self.row(str(category).capitalize())
 
     @keyboard
-    def exercises(self):
-        self.row('🏠 Главное меню')
+    def exercises(self, exercise_page: Page):
+        exersices_keys = [str(exercise.id) for exercise in exercise_page.object_list]
+        self.row(*exersices_keys)
+        if exercise_page.has_next() and exercise_page.has_previous():
+            self.row('Предыдущая страница', 'Следующая страница')
+        elif exercise_page.has_next():
+            self.row('Следующая страница ▶️')
+        else:
+            self.row('⬅️ Предыдущая страница')
+        self.row('🔙 Назад', '🏠 Главное меню')
+
+    @keyboard
+    def exercise(self):
+        self.row('Выполнить упражнение')
+        self.row('🔙 Назад', '🏠 Главное меню')
+
+
+    @keyboard
+    def exercise_use(self):
+        self.row('Продолжить ➡')
+        self.row('❌ Закончить упражнение')
+
+    def clear_keyboard(self):
+        return ReplyKeyboardRemove()
+
+
+    # def exercises(self, exersices) -> types.InlineKeyboardMarkup:
+    #     markup = types.InlineKeyboardMarkup()
+    #     btn_list = []
+    #     for exersice in exersices:
+    #         btn = types.InlineKeyboardButton(text=exersice.id, callback_data=exersice.id)
+    #         btn_list.append(btn)
+    #     markup.add(*btn_list)
+    #     return markup
