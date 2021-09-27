@@ -48,3 +48,8 @@ class Bot:
         return self.context.edit_message(self.user.id,
                                          text,
                                          message_id)
+
+    def error_404(self):
+        text_message = 'Неизвестная комманда 😧...'
+        self.send_message(text_message, self.keyboard.main())
+        self.user.save_state('/')

@@ -49,7 +49,12 @@ def previos_page_exercis(bot: Bot, category: str, page_number):
 
 
 def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
-    exercise = Exersice.objects.get(id=int(exercise_id))
+    try:
+        exercise_id = int(exercise_id)
+    except ValueError:
+        bot.send_message('Неверно введён индекс упражнения 😧')
+        return
+    exercise = Exersice.objects.get(id=exercise_id)
     context = {'exercise': exercise}
     message = render_to_string('exercise.html', context=context)
     bot.send_message(message, bot.keyboard.exercise())
@@ -87,12 +92,23 @@ def input_mass(bot: Bot, exercise_id: str, exercise_use_id: str):
 
 
 def input_repeat(bot: Bot, exercise_id: str, exercise_use_id: str, mass: str):
+    # TODO: Написать валидатор
+    try:
+        mass = int(mass)
+    except ValueError:
+        bot.send_message('Неверна введена масса 😧, попробуйте ещё раз ')
+        return
     text = 'Введите кол-во повторений'
     bot.send_message(text, bot.keyboard.clear_keyboard())
     bot.user.save_state()
 
 
 def save_set(bot: Bot, exercise_id: str, exercise_use_id: str, mass: str, repeat: str):
+    try:
+        repeat = int(repeat)
+    except ValueError:
+        bot.send_message('Неверна введено кол-во повторений 😧, попробуйте ещё раз ')
+        return
     exercise_use_obj = ExerciseUse.objects.get(id=int(exercise_use_id))
     last_set = exercise_use_obj.sets.all().order_by('-count_index').first()
     last_set.mass = int(mass)
