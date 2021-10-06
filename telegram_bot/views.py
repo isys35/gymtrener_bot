@@ -12,13 +12,14 @@ def welcome(bot: Bot, **kwargs):
     bot.send_message(message, bot.keyboard.main())
 
 
-@save_state("/выбрать упражнение")
 def select_category(bot: Bot, **kwargs):
     categories = Category.objects.all()
     if not categories:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
+        bot.user.save_state('/')
         return
     bot.send_message("Выберите категорию упражнений", bot.keyboard.categories(categories))
+    bot.user.save_state("/выбрать упражнение")
 
 
 def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
@@ -29,7 +30,7 @@ def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
     exersices = Exersice.objects.filter(category__title=category).order_by('id')
     if not exersices:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
-        bot.user.save_state()
+        bot.user.save_state("/выбрать упражнение")
         return
     paginator = Paginator(exersices, settings.PAGINATOR_SIZE)
     context = {'exersices': paginator.page(page)}
