@@ -1,0 +1,25 @@
+version: "3"
+
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_gymtrener
+    volumes:
+      - .:/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - keys.txt
+    command: ["sh", "-c", "python3 manage.py migrate&&python3 manage.py runserver 0.0.0.0:8000"]
+
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file:
+      - keys.txt
