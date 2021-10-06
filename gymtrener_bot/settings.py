@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-^u=q&6t#!866gmzw+81f#ndd#od-pv2&-fexe&i%l#!l%ol2n*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['gymtrenerbot.drozdof.monster', '0.0.0.0']
+ALLOWED_HOSTS = ['gymtrenerbot.drozdof.monster', '0.0.0.0', '127.0.0.1']
 
 
 # Application definition
