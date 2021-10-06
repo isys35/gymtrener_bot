@@ -22,7 +22,6 @@ class WebHook(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        save_json(request.body)
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"success": False, 'error': 'Not message'}, status=status.HTTP_200_OK)
