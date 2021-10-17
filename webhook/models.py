@@ -38,6 +38,7 @@ class Exersice(models.Model):
     title = models.CharField(max_length=100, db_index=True, unique=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True, default=None)
+    image = models.ImageField(upload_to='images', blank=True)
 
     def __str__(self):
         return f"{self.title}"

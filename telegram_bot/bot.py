@@ -1,6 +1,7 @@
 from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.keyboard import BotKeyboard
 from webhook.serializers import UpdateSerializer
+from django.core.files.base import File
 
 
 def save_state(state: str = '/'):
@@ -43,6 +44,12 @@ class Bot:
         return self.context.send_message(self.user.id,
                                          text,
                                          markup)
+
+    def send_photo(self, text: str, photo: File, markup=None):
+        return self.context.send_photo(self.user.id,
+                                       photo,
+                                       text,
+                                       markup)
 
     def edit_message(self, text: str, message_id: int):
         return self.context.edit_message(self.user.id,

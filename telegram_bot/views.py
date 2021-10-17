@@ -58,7 +58,10 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
     exercise = Exersice.objects.get(id=exercise_id)
     context = {'exercise': exercise}
     message = render_to_string('exercise.html', context=context)
-    bot.send_message(message, bot.keyboard.exercise())
+    if exercise.image:
+        bot.send_photo(message, exercise.image.file, bot.keyboard.exercise())
+    else:
+        bot.send_message(message, bot.keyboard.exercise())
     bot.user.save_state()
 
 

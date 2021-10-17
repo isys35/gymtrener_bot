@@ -1,3 +1,6 @@
+from io import BufferedReader
+from typing import Union
+from django.core.files.base import File
 import telebot
 
 from telegram_bot.user import User
@@ -49,6 +52,17 @@ class TelegramContext:
             'timeout': 1
         }
         self.bot.send_message(**kwargs)
+
+    def send_photo(self, receiver: int, photo: Union[File, BufferedReader], caption: str, markup: telebot.types.ReplyKeyboardMarkup = None):
+        kwargs = {
+            'chat_id': receiver,
+            'photo': photo,
+            'disable_notification': True,
+            'caption': caption,
+            'reply_markup': markup,
+            'timeout': 1
+        }
+        self.bot.send_photo(**kwargs)
 
     def edit_message(self, receiver: int, text: str, message_id: int):
         kwargs = {
