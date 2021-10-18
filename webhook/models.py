@@ -3,9 +3,10 @@ from django.db import models
 
 class TelegramUser(models.Model):
     first_name = models.CharField(max_length=100, db_index=True)
-    last_name = models.CharField(max_length=100, db_index=True, blank=True,  null=True, default=None)
+    last_name = models.CharField(max_length=100, db_index=True, blank=True, null=True, default=None)
     username = models.CharField(max_length=100, db_index=True, default=None)
     state = models.CharField(max_length=200, default='/')
+    favorite_exercises = models.ManyToManyField('Exersice', through='FavoritedExercises')
 
 
 class TelegramMessage(models.Model):
@@ -13,6 +14,20 @@ class TelegramMessage(models.Model):
     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     text = models.TextField(blank=True, default=None)
+
+
+class FavoritedExercises(models.Model):
+    class Meta:
+        unique_together = ("user", "exercise")
+
+    user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.CASCADE,
+    )
+    exercise = models.ForeignKey(
+        'Exersice',
+        on_delete=models.CASCADE,
+    )
 
 
 class ChatSerializer(models.Model):

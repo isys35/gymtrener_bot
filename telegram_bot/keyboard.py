@@ -72,8 +72,12 @@ class BotKeyboard(State):
         self.row('🔙 Назад', '🏠 Главное меню')
 
     @keyboard
-    def exercise(self):
+    def exercise(self, favorited=False):
         self.row('Выполнить упражнение')
+        if not favorited:
+            self.row('Добавить в избранное ⭐️')
+        else:
+            self.row('Удалить из избранного 🌟️')
         self.row('🔙 Назад', '🏠 Главное меню')
 
 

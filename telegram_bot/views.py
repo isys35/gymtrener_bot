@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 
 from telegram_bot.bot import save_state, Bot
-from webhook.models import Category, Exersice, ExerciseUse, Set
+from webhook.models import Category, Exersice, ExerciseUse, Set, FavoritedExercises
 
 
 @save_state("/")
@@ -119,3 +119,14 @@ def save_set(bot: Bot, exercise_id: str, exercise_use_id: str, mass: str, repeat
     last_set.repeat = int(repeat)
     last_set.save()
     exercise_use(bot, exercise_id=exercise_id, exercise_use_id=exercise_use_id)
+
+
+def favorite_action(bot: Bot, **kwargs):
+    exercise_id = int(kwargs.get('exercise_id'))
+    favorited = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
+    if not favorited:
+        FavoritedExercises.objects.create(user_id=bot.user.id, exercise_id=exercise_id)
+        bot.send_message('Упражнение добавлено в избранное', bot.keyboard.exercise(True))
+    else:
+        favorited.first().delete()
+        bot.send_message('Упражнение удалено из избранного', bot.keyboard.exercise())

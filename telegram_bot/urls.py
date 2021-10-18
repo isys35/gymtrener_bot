@@ -1,5 +1,5 @@
 from telegram_bot.views import welcome, select_category, select_exercise, previos_page_exercis, next_page_exercise, \
-    exercise_info, exercise_use, close_exercise, input_mass, input_repeat, save_set
+    exercise_info, exercise_use, close_exercise, input_mass, input_repeat, save_set, favorite_action
 
 urls = [
     (r'<wc:req>/start', welcome),
@@ -12,6 +12,7 @@ urls = [
     (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>', exercise_info),
     (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/назад', select_exercise),
     (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/выполнить упражнение', exercise_use),
+    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/добавить в избранное', favorite_action),
 
     (r'/exercise_use/<str:exercise_id>/<str:exercise_use_id>/закончить упражнение', close_exercise),
     (r'/exercise_use/<str:exercise_id>/<str:exercise_use_id>/продолжить', input_mass),
