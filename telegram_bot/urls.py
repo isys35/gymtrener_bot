@@ -10,9 +10,10 @@ urls = [
     (r'/выбрать упражнение/<str:category>/<str:page_number>/следующая страница', next_page_exercise),
     (r'/выбрать упражнение/<str:category>/<str:page_number>/предыдущая страница', previos_page_exercis),
     (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>', exercise_info),
-    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/назад', select_exercise),
-    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/выполнить упражнение', exercise_use),
-    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/добавить в избранное', favorite_action),
+    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/<str:message_id>/назад', select_exercise),
+    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/<str:message_id>/выполнить упражнение', exercise_use),
+    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/<str:message_id>/добавить в избранное', favorite_action),
+    (r'/выбрать упражнение/<str:category>/<str:page_number>/<str:exercise_id>/<str:message_id>/удалить из избранного', favorite_action),
 
     (r'/exercise_use/<str:exercise_id>/<str:exercise_use_id>/закончить упражнение', close_exercise),
     (r'/exercise_use/<str:exercise_id>/<str:exercise_use_id>/продолжить', input_mass),

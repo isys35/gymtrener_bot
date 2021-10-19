@@ -56,13 +56,17 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
         bot.send_message('Неверно введён индекс упражнения 😧')
         return
     exercise = Exersice.objects.get(id=exercise_id)
-    context = {'exercise': exercise}
+    favorited_exrcise = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
+    is_favorite = False
+    if favorited_exrcise:
+        is_favorite = True
+    context = {'exercise': exercise, 'favorite': is_favorite}
     message = render_to_string('exercise.html', context=context)
     if exercise.image:
-        bot.send_photo(message, exercise.image.file, bot.keyboard.exercise())
+        message = bot.send_photo(message, exercise.image.file, bot.keyboard.exercise(is_favorite))
     else:
-        bot.send_message(message, bot.keyboard.exercise())
-    bot.user.save_state()
+        message = bot.send_message(message, bot.keyboard.exercise(is_favorite))
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')
 
 
 def exercise_use(bot: Bot, **kwargs):
@@ -124,9 +128,18 @@ def save_set(bot: Bot, exercise_id: str, exercise_use_id: str, mass: str, repeat
 def favorite_action(bot: Bot, **kwargs):
     exercise_id = int(kwargs.get('exercise_id'))
     favorited = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
+    exercise = Exersice.objects.filter(id=exercise_id).first()
+    message_id = kwargs.get('message_id')
+    category = kwargs.get('category')
+    page_number = kwargs.get('page_number')
     if not favorited:
         FavoritedExercises.objects.create(user_id=bot.user.id, exercise_id=exercise_id)
-        bot.send_message('Упражнение добавлено в избранное', bot.keyboard.exercise(True))
+        context = {'exercise': exercise, 'favorite': True}
+        message_text = render_to_string('exercise.html', context=context)
+        message = bot.edit_message(message_text, message_id, bot.keyboard.exercise(True))
     else:
         favorited.first().delete()
-        bot.send_message('Упражнение удалено из избранного', bot.keyboard.exercise())
+        context = {'exercise': exercise, 'favorite': False}
+        message_text = render_to_string('exercise.html', context=context)
+        message = bot.edit_message(message_text, message_id, bot.keyboard.exercise())
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')

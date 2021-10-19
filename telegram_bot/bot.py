@@ -51,10 +51,11 @@ class Bot:
                                        text,
                                        markup)
 
-    def edit_message(self, text: str, message_id: int):
-        return self.context.edit_message(self.user.id,
-                                         text,
-                                         message_id)
+    def edit_message(self, text: str, message_id: int, markup=None):
+        return self.context.delete_and_create_new_message(self.user.id,
+                                                          text,
+                                                          message_id,
+                                                          markup)
 
     def error_404(self):
         text_message = 'Неизвестная комманда 😧...'
