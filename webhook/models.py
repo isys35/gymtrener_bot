@@ -54,6 +54,11 @@ class Exersice(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True, default=None)
     image = models.ImageField(upload_to='images', blank=True)
+    details_url = models.URLField(max_length=100, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.details_url = 'https://www.google.com/search?q=' + self.title.lower()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title}"
