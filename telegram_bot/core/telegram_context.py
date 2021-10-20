@@ -1,5 +1,5 @@
 from io import BufferedReader
-from typing import Union
+from typing import Union, Optional
 from django.core.files.base import File
 import telebot
 from telebot.types import Message
@@ -78,8 +78,11 @@ class TelegramContext:
 
     def delete_and_create_new_message(self, receiver: int,
                                       text: str, message_id: int,
-                                      markup: telebot.types.ReplyKeyboardMarkup = None):
+                                      markup: telebot.types.ReplyKeyboardMarkup = None,
+                                      photo: Optional[File] = None):
         self.bot.delete_message(chat_id=receiver, message_id=message_id)
+        if photo:
+            return self.send_photo(receiver, photo, text, markup)
         return self.send_message(receiver, text, markup)
 
     @staticmethod

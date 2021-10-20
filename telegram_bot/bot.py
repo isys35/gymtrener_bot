@@ -1,3 +1,5 @@
+from typing import Optional
+
 from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.keyboard import BotKeyboard
 from webhook.serializers import UpdateSerializer
@@ -51,11 +53,12 @@ class Bot:
                                        text,
                                        markup)
 
-    def edit_message(self, text: str, message_id: int, markup=None):
+    def edit_message(self, text: str, message_id: int, markup=None, photo: Optional[File] = None):
         return self.context.delete_and_create_new_message(self.user.id,
                                                           text,
                                                           message_id,
-                                                          markup)
+                                                          markup,
+                                                          photo)
 
     def error_404(self):
         text_message = 'Неизвестная комманда 😧...'

@@ -135,11 +135,14 @@ def favorite_action(bot: Bot, **kwargs):
     if not favorited:
         FavoritedExercises.objects.create(user_id=bot.user.id, exercise_id=exercise_id)
         context = {'exercise': exercise, 'favorite': True}
-        message_text = render_to_string('exercise.html', context=context)
-        message = bot.edit_message(message_text, message_id, bot.keyboard.exercise(True))
+        keyboard = bot.keyboard.exercise(True)
     else:
         favorited.first().delete()
         context = {'exercise': exercise, 'favorite': False}
-        message_text = render_to_string('exercise.html', context=context)
-        message = bot.edit_message(message_text, message_id, bot.keyboard.exercise())
+        keyboard = bot.keyboard.exercise(False)
+    message_text = render_to_string('exercise.html', context=context)
+    if exercise.image:
+        message = bot.edit_message(message_text, message_id, keyboard, exercise.image.file)
+    else:
+        message = bot.edit_message(message_text, message_id, keyboard)
     bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')
