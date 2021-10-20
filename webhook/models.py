@@ -3,9 +3,10 @@ from django.db import models
 
 class TelegramUser(models.Model):
     first_name = models.CharField(max_length=100, db_index=True)
-    last_name = models.CharField(max_length=100, db_index=True, blank=True,  null=True, default=None)
+    last_name = models.CharField(max_length=100, db_index=True, blank=True, null=True, default=None)
     username = models.CharField(max_length=100, db_index=True, default=None)
     state = models.CharField(max_length=200, default='/')
+    favorite_exercises = models.ManyToManyField('Exersice', through='FavoritedExercises')
 
 
 class TelegramMessage(models.Model):
@@ -13,6 +14,20 @@ class TelegramMessage(models.Model):
     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     text = models.TextField(blank=True, default=None)
+
+
+class FavoritedExercises(models.Model):
+    class Meta:
+        unique_together = ("user", "exercise")
+
+    user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.CASCADE,
+    )
+    exercise = models.ForeignKey(
+        'Exersice',
+        on_delete=models.CASCADE,
+    )
 
 
 class ChatSerializer(models.Model):
@@ -38,6 +53,12 @@ class Exersice(models.Model):
     title = models.CharField(max_length=100, db_index=True, unique=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     description = models.TextField(blank=True, default=None)
+    image = models.ImageField(upload_to='images', blank=True)
+    details_url = models.URLField(max_length=100, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.details_url = 'https://www.google.com/search?q=' + self.title.lower()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title}"

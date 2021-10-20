@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 
 from telegram_bot.bot import save_state, Bot
-from webhook.models import Category, Exersice, ExerciseUse, Set
+from webhook.models import Category, Exersice, ExerciseUse, Set, FavoritedExercises
 
 
 @save_state("/")
@@ -12,13 +12,14 @@ def welcome(bot: Bot, **kwargs):
     bot.send_message(message, bot.keyboard.main())
 
 
-@save_state("/выбрать упражнение")
 def select_category(bot: Bot, **kwargs):
     categories = Category.objects.all()
     if not categories:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
+        bot.user.save_state('/')
         return
     bot.send_message("Выберите категорию упражнений", bot.keyboard.categories(categories))
+    bot.user.save_state("/выбрать упражнение")
 
 
 def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
@@ -29,7 +30,7 @@ def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
     exersices = Exersice.objects.filter(category__title=category).order_by('id')
     if not exersices:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
-        bot.user.save_state()
+        bot.user.save_state("/выбрать упражнение")
         return
     paginator = Paginator(exersices, settings.PAGINATOR_SIZE)
     context = {'exersices': paginator.page(page)}
@@ -55,10 +56,17 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
         bot.send_message('Неверно введён индекс упражнения 😧')
         return
     exercise = Exersice.objects.get(id=exercise_id)
-    context = {'exercise': exercise}
+    favorited_exrcise = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
+    is_favorite = False
+    if favorited_exrcise:
+        is_favorite = True
+    context = {'exercise': exercise, 'favorite': is_favorite}
     message = render_to_string('exercise.html', context=context)
-    bot.send_message(message, bot.keyboard.exercise())
-    bot.user.save_state()
+    if exercise.image:
+        message = bot.send_photo(message, exercise.image.file, bot.keyboard.exercise(is_favorite))
+    else:
+        message = bot.send_message(message, bot.keyboard.exercise(is_favorite))
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')
 
 
 def exercise_use(bot: Bot, **kwargs):
@@ -115,3 +123,26 @@ def save_set(bot: Bot, exercise_id: str, exercise_use_id: str, mass: str, repeat
     last_set.repeat = int(repeat)
     last_set.save()
     exercise_use(bot, exercise_id=exercise_id, exercise_use_id=exercise_use_id)
+
+
+def favorite_action(bot: Bot, **kwargs):
+    exercise_id = int(kwargs.get('exercise_id'))
+    favorited = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
+    exercise = Exersice.objects.filter(id=exercise_id).first()
+    message_id = kwargs.get('message_id')
+    category = kwargs.get('category')
+    page_number = kwargs.get('page_number')
+    if not favorited:
+        FavoritedExercises.objects.create(user_id=bot.user.id, exercise_id=exercise_id)
+        context = {'exercise': exercise, 'favorite': True}
+        keyboard = bot.keyboard.exercise(True)
+    else:
+        favorited.first().delete()
+        context = {'exercise': exercise, 'favorite': False}
+        keyboard = bot.keyboard.exercise(False)
+    message_text = render_to_string('exercise.html', context=context)
+    if exercise.image:
+        message = bot.edit_message(message_text, message_id, keyboard, exercise.image.file)
+    else:
+        message = bot.edit_message(message_text, message_id, keyboard)
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')

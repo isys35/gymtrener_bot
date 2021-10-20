@@ -1,6 +1,9 @@
+from typing import Optional
+
 from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.keyboard import BotKeyboard
 from webhook.serializers import UpdateSerializer
+from django.core.files.base import File
 
 
 def save_state(state: str = '/'):
@@ -44,10 +47,18 @@ class Bot:
                                          text,
                                          markup)
 
-    def edit_message(self, text: str, message_id: int):
-        return self.context.edit_message(self.user.id,
-                                         text,
-                                         message_id)
+    def send_photo(self, text: str, photo: File, markup=None):
+        return self.context.send_photo(self.user.id,
+                                       photo,
+                                       text,
+                                       markup)
+
+    def edit_message(self, text: str, message_id: int, markup=None, photo: Optional[File] = None):
+        return self.context.delete_and_create_new_message(self.user.id,
+                                                          text,
+                                                          message_id,
+                                                          markup,
+                                                          photo)
 
     def error_404(self):
         text_message = 'Неизвестная комманда 😧...'

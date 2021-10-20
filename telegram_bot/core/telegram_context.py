@@ -1,4 +1,8 @@
+from io import BufferedReader
+from typing import Union, Optional
+from django.core.files.base import File
 import telebot
+from telebot.types import Message
 
 from telegram_bot.user import User
 from webhook.serializers import UpdateSerializer
@@ -31,7 +35,7 @@ class TelegramContext:
     def send_message(self,
                      receiver: int,
                      text: str,
-                     markup: telebot.types.ReplyKeyboardMarkup = None) -> None:
+                     markup: telebot.types.ReplyKeyboardMarkup = None) -> Message:
         """
         Отправляет сообщение пользователю в Telegram.
         :param receiver: id пользователя в Telegram
@@ -48,7 +52,21 @@ class TelegramContext:
             'reply_markup': markup,
             'timeout': 1
         }
-        self.bot.send_message(**kwargs)
+        return self.bot.send_message(**kwargs)
+
+    def send_photo(self, receiver: int,
+                   photo: Union[File, BufferedReader],
+                   caption: str,
+                   markup: telebot.types.ReplyKeyboardMarkup = None) -> Message:
+        kwargs = {
+            'chat_id': receiver,
+            'photo': photo,
+            'disable_notification': True,
+            'caption': caption,
+            'reply_markup': markup,
+            'timeout': 1
+        }
+        return self.bot.send_photo(**kwargs)
 
     def edit_message(self, receiver: int, text: str, message_id: int):
         kwargs = {
@@ -57,6 +75,15 @@ class TelegramContext:
             'message_id': message_id
         }
         self.bot.edit_message_text(**kwargs)
+
+    def delete_and_create_new_message(self, receiver: int,
+                                      text: str, message_id: int,
+                                      markup: telebot.types.ReplyKeyboardMarkup = None,
+                                      photo: Optional[File] = None):
+        self.bot.delete_message(chat_id=receiver, message_id=message_id)
+        if photo:
+            return self.send_photo(receiver, photo, text, markup)
+        return self.send_message(receiver, text, markup)
 
     @staticmethod
     def get_user(update: UpdateSerializer):
