@@ -30,5 +30,8 @@ class WebHook(APIView):
         telegram_context = TelegramContext(settings.TELEGRAM_TOKEN)
         bot = Bot(telegram_context, serializer)
         router = Router(urls)
-        router.url_dispatcher(bot)
+        try:
+            router.url_dispatcher(bot)
+        except Exception:
+            return Response({"error": True}, status=status.HTTP_200_OK)
         return Response({"success": True}, status=status.HTTP_200_OK)
