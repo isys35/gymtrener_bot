@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.db.models import Count
 from django.template.loader import render_to_string
 
 from telegram_bot.bot import save_state, Bot
@@ -57,10 +60,23 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
         return
     exercise = Exersice.objects.get(id=exercise_id)
     favorited_exrcise = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
+    exercise_uses = ExerciseUse.objects.filter(
+        user_id=bot.user.id, exercise_id=exercise_id
+    ).annotate(
+        count_sets=Count('sets')
+    ).exclude(
+        count_sets=0
+    ).order_by('date_start').prefetch_related('sets')
+    last_exercise_use = exercise_uses.last()
+    count_exercise_use = exercise_uses.count()
     is_favorite = False
     if favorited_exrcise:
         is_favorite = True
-    context = {'exercise': exercise, 'favorite': is_favorite}
+    context = {'exercise': exercise,
+               'favorite': is_favorite,
+               'count_exercise_use': count_exercise_use,
+               'last_exercise_use': last_exercise_use,
+               'sets': last_exercise_use.sets.all()}
     message = render_to_string('exercise.html', context=context)
     if exercise.image:
         message = bot.send_photo(message, exercise.image.file, bot.keyboard.exercise(is_favorite))
@@ -89,6 +105,9 @@ def exercise_use(bot: Bot, **kwargs):
 
 @save_state("/")
 def close_exercise(bot: Bot, exercise_id: str, exercise_use_id: str):
+    exercise_use_obj = ExerciseUse.objects.get(id=int(exercise_use_id))
+    exercise_use_obj.date_finish = datetime.now()
+    exercise_use_obj.save()
     text = 'Вы завершили упражнение, вот статистика бла бла бла'
     bot.send_message(text, bot.keyboard.main())
 

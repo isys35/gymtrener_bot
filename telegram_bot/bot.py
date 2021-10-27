@@ -42,7 +42,7 @@ class Bot:
         self.update = update
         self.user = self.context.get_user(update)
 
-    def send_message(self, text: str, markup=True):
+    def send_message(self, text: str, markup=None):
         return self.context.send_message(self.user.id,
                                          text,
                                          markup)

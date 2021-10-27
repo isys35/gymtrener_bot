@@ -67,7 +67,7 @@ class Exersice(models.Model):
 class ExerciseUse(models.Model):
     exercise = models.ForeignKey(Exersice, on_delete=models.CASCADE)
     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
-    date_start = models.DateTimeField(auto_created=True, blank=True, null=True)
+    date_start = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     date_finish = models.DateTimeField(blank=True, null=True, default=None)
 
 
