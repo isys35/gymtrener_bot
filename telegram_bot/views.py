@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
@@ -89,6 +91,9 @@ def exercise_use(bot: Bot, **kwargs):
 
 @save_state("/")
 def close_exercise(bot: Bot, exercise_id: str, exercise_use_id: str):
+    exercise_use_obj = ExerciseUse.objects.get(id=int(exercise_use_id))
+    exercise_use_obj.date_finish = datetime.now()
+    exercise_use_obj.save()
     text = 'Вы завершили упражнение, вот статистика бла бла бла'
     bot.send_message(text, bot.keyboard.main())
 
