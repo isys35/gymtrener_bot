@@ -69,6 +69,9 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
     ).order_by('date_start').prefetch_related('sets')
     last_exercise_use = exercise_uses.last()
     count_exercise_use = exercise_uses.count()
+    sets = None
+    if last_exercise_use:
+        sets = last_exercise_use.sets()
     is_favorite = False
     if favorited_exrcise:
         is_favorite = True
@@ -76,7 +79,7 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
                'favorite': is_favorite,
                'count_exercise_use': count_exercise_use,
                'last_exercise_use': last_exercise_use,
-               'sets': last_exercise_use.sets.all()}
+               'sets': sets}
     message = render_to_string('exercise.html', context=context)
     if exercise.image:
         message = bot.send_photo(message, exercise.image.file, bot.keyboard.exercise(is_favorite))
