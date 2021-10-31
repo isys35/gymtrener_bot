@@ -79,8 +79,11 @@ class Router:
     def url_dispatcher(self, bot: Bot):
         view = self.static_urls.get(bot.user.full_request)
         if view is not None:
-             view(bot)
-             return
+            try:
+                 view(bot)
+            except Exception:
+                bot.error_404()
+            return
         else:
             result = {}
             for dynamic_url in self.dynamic_urls:
@@ -90,7 +93,10 @@ class Router:
                     view = dynamic_url[1]
                     break
             if view:
-                view(bot, **result.groupdict())
+                try:
+                    view(bot, **result.groupdict())
+                except Exception:
+                    bot.error_404()
                 return
         bot.error_404()
 
