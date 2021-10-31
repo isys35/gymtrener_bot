@@ -81,7 +81,8 @@ class Router:
         if view is not None:
             try:
                  view(bot)
-            except Exception:
+            except Exception as ex:
+                print(ex)
                 bot.error_404()
             return
         else:
@@ -95,7 +96,8 @@ class Router:
             if view:
                 try:
                     view(bot, **result.groupdict())
-                except Exception:
+                except Exception as ex:
+                    print(ex)
                     bot.error_404()
                 return
         bot.error_404()
