@@ -1,6 +1,7 @@
 import re
 
 from telegram_bot.bot import Bot
+import traceback
 
 
 class ReFormat:
@@ -82,7 +83,7 @@ class Router:
             try:
                  view(bot)
             except Exception as ex:
-                print(ex)
+                print(traceback.format_exc())
                 bot.error_404()
             return
         else:
@@ -97,7 +98,7 @@ class Router:
                 try:
                     view(bot, **result.groupdict())
                 except Exception as ex:
-                    print(ex)
+                    print(traceback.format_exc())
                     bot.error_404()
                 return
         bot.error_404()
