@@ -71,7 +71,7 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
     count_exercise_use = exercise_uses.count()
     sets = None
     if last_exercise_use:
-        sets = last_exercise_use.sets()
+        sets = last_exercise_use.sets.all()
     is_favorite = False
     if favorited_exrcise:
         is_favorite = True
