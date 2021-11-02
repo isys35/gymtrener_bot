@@ -52,6 +52,8 @@ class BotKeyboard(State):
         :return: None
         """
         self.row('💪🏻 Выбрать упражнение')
+        self.row('⭐️ Избранные упражнения')
+        self.row('Последние упражнения')
 
     @keyboard
     def categories(self, categories_list):
@@ -67,9 +69,21 @@ class BotKeyboard(State):
             self.row('Предыдущая страница', 'Следующая страница')
         elif exercise_page.has_next():
             self.row('Следующая страница ▶️')
-        else:
+        elif exercise_page.has_previous():
             self.row('⬅️ Предыдущая страница')
         self.row('🔙 Назад', '🏠 Главное меню')
+
+    @keyboard
+    def favorite_exercises(self, exercise_page: Page):
+        exersices_keys = [str(exercise.exercise.id) for exercise in exercise_page.object_list]
+        self.row(*exersices_keys)
+        if exercise_page.has_next() and exercise_page.has_previous():
+            self.row('Предыдущая страница', 'Следующая страница')
+        elif exercise_page.has_next():
+            self.row('Следующая страница ▶️')
+        elif exercise_page.has_previous():
+            self.row('⬅️ Предыдущая страница')
+        self.row('🏠 Главное меню')
 
     @keyboard
     def exercise(self, favorited=False):

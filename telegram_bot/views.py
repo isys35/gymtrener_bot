@@ -26,20 +26,18 @@ def select_category(bot: Bot, **kwargs):
 
 
 def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
-    if page_number is None:
-        page = 1
-    else:
-        page = int(page_number)
+    page_number = kwargs.get('page_number') or 1
+    page_number = int(page_number)
     exersices = Exersice.objects.filter(category__title=category).order_by('id')
     if not exersices:
         bot.send_message("В базе нету упражнений 😔", bot.keyboard.main())
         bot.user.save_state("/выбрать упражнение")
         return
     paginator = Paginator(exersices, settings.PAGINATOR_SIZE)
-    context = {'exersices': paginator.page(page)}
+    context = {'exersices': paginator.page(page_number)}
     message = render_to_string('exercises.html', context=context)
-    bot.send_message(message, bot.keyboard.exercises(paginator.page(page)))
-    bot.user.save_state(f'/выбрать упражнение/{category}/{page}')
+    bot.send_message(message, bot.keyboard.exercises(paginator.page(page_number)))
+    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}')
 
 
 def next_page_exercise(bot: Bot, category: str, page_number):
@@ -52,13 +50,13 @@ def previos_page_exercis(bot: Bot, category: str, page_number):
     select_exercise(bot, category, page)
 
 
-def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
+def exercise_info(bot: Bot, **kwargs):
     try:
-        exercise_id = int(exercise_id)
+        exercise_id = int(kwargs.get('exercise_id'))
     except ValueError:
         bot.send_message('Неверно введён индекс упражнения 😧')
         return
-    exercise = Exersice.objects.get(id=exercise_id)
+    exercise = Exersice.objects.get(id=exercise_id).select_related('category')
     favorited_exrcise = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
     exercise_uses = ExerciseUse.objects.filter(
         user_id=bot.user.id, exercise_id=exercise_id
@@ -85,7 +83,8 @@ def exercise_info(bot: Bot, category: str, page_number: str, exercise_id: str):
         message = bot.send_photo(message, exercise.image.file, bot.keyboard.exercise(is_favorite))
     else:
         message = bot.send_message(message, bot.keyboard.exercise(is_favorite))
-    bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')
+    page_number = kwargs.get('page_number') or 1
+    bot.user.save_state(f'/выбрать упражнение/{exercise.category.title}/{page_number}/{exercise_id}/{message.id}')
 
 
 def exercise_use(bot: Bot, **kwargs):
@@ -168,3 +167,24 @@ def favorite_action(bot: Bot, **kwargs):
     else:
         message = bot.edit_message(message_text, message_id, keyboard)
     bot.user.save_state(f'/выбрать упражнение/{category}/{page_number}/{exercise_id}/{message.id}')
+
+
+def favorite_exercises(bot: Bot, **kwargs):
+    user_id = bot.user.id
+    favorite_exercises = FavoritedExercises.objects.filter(user_id=user_id).\
+        select_related('exercise').\
+        order_by('exercise_id').\
+        all()
+    if not favorite_exercises:
+        bot.send_message('Избранные упражнения не найдены 😧', bot.keyboard.main())
+        bot.user.save_state('/')
+        return
+    page_number = kwargs.get('page_number') or 1
+    page_number = int(page_number)
+    paginator = Paginator(favorite_exercises, settings.PAGINATOR_SIZE)
+    exercises = [{'id': favorite_exercise.exercise.id, 'title': favorite_exercise.exercise.title}
+                 for favorite_exercise in paginator.page(page_number)]
+    context = {'exercises': exercises}
+    message_text = render_to_string('favorite_exercises.html', context=context)
+    bot.send_message(message_text, bot.keyboard.favorite_exercises(paginator.page(page_number)))
+    bot.user.save_state(f'/избранные упражнения/{page_number}')

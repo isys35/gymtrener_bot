@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.utils.safestring import SafeString
 
-from telegram_bot.views import welcome, select_category, select_exercise
+from telegram_bot.views import welcome, select_category, select_exercise, favorite_exercises
 from tests.conftest import BotMock
-from webhook.models import Category, Exersice
+from webhook.models import Category, Exersice, FavoritedExercises, TelegramUser
 
 
 class WelcomeTest(TestCase):
@@ -50,3 +50,29 @@ class SelectExerciseTest(TestCase):
         exercise.save()
         select_exercise(self.bot, category='грудь')
         self.assertEqual('/выбрать упражнение/грудь/1', self.bot.user.state)
+
+
+class SelectFavoriteExerciseTest(TestCase):
+
+    def setUp(self):
+        self.tg_user = TelegramUser(id=123,
+                                    first_name='dasdasdas',
+                                    last_name='dasdasdasd',
+                                    username='dasdasd')
+        self.tg_user.save()
+        self.bot = BotMock()
+        self.bot.user.id = self.tg_user.id
+        self.category = Category(title='Грудь')
+        self.category.save()
+        self.exercise = Exersice(title='Упражнение', category=self.category)
+        self.exercise.save()
+
+    def test_select_exercise(self):
+        favorite_exercises(self.bot)
+        self.assertEqual('/', self.bot.user.state)
+
+        favorite_exercise = FavoritedExercises(user_id=self.tg_user.id, exercise_id=self.exercise.id)
+        favorite_exercise.save()
+
+        favorite_exercises(self.bot)
+        self.assertEqual('/избранные упражнения/1', self.bot.user.state)
