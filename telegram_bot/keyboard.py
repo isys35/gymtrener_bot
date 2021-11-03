@@ -1,3 +1,5 @@
+from typing import List
+
 from django.core.paginator import Page
 from telebot.types import ReplyKeyboardRemove
 
@@ -83,6 +85,12 @@ class BotKeyboard(State):
             self.row('Следующая страница ▶️')
         elif exercise_page.has_previous():
             self.row('⬅️ Предыдущая страница')
+        self.row('🏠 Главное меню')
+
+    @keyboard
+    def last_exercises(self, exercises: List[dict]):
+        exersices_keys = [str(exercise['id']) for exercise in exercises]
+        self.row(*exersices_keys)
         self.row('🏠 Главное меню')
 
     @keyboard

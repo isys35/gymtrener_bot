@@ -98,7 +98,7 @@ def exercise_use(bot: Bot, **kwargs):
         exercise_use_obj = ExerciseUse.objects.get(id=int(exercise_use_id))
         last_exercise_set = exercise_use_obj.sets.all().order_by('-count_index').first()
         exercise_set = Set.objects.create(exercise_use=exercise_use_obj,
-                                          count_index=last_exercise_set.count_index+1)
+                                          count_index=last_exercise_set.count_index + 1)
     context = {'set_count': exercise_set.count_index}
     message = render_to_string('exercise_use.html', context=context)
     bot.send_message(message, bot.keyboard.exercise_use())
@@ -171,9 +171,9 @@ def favorite_action(bot: Bot, **kwargs):
 
 def favorite_exercises(bot: Bot, **kwargs):
     user_id = bot.user.id
-    favorite_exercises = FavoritedExercises.objects.filter(user_id=user_id).\
-        select_related('exercise').\
-        order_by('exercise_id').\
+    favorite_exercises = FavoritedExercises.objects.filter(user_id=user_id). \
+        select_related('exercise'). \
+        order_by('exercise_id'). \
         all()
     if not favorite_exercises:
         bot.send_message('Избранные упражнения не найдены 😧', bot.keyboard.main())
@@ -188,3 +188,23 @@ def favorite_exercises(bot: Bot, **kwargs):
     message_text = render_to_string('favorite_exercises.html', context=context)
     bot.send_message(message_text, bot.keyboard.favorite_exercises(paginator.page(page_number)))
     bot.user.save_state(f'/избранные упражнения/{page_number}')
+
+
+def last_exercises(bot: Bot, **kwargs):
+    user_id = bot.user.id
+    last_exerciseuses = ExerciseUse.objects \
+                            .filter(user_id=user_id) \
+                            .distinct('exercise_id') \
+                            .order_by('exercise_id', '-date_finish') \
+                            .select_related('exercise')[:5]
+    if not last_exerciseuses:
+        bot.send_message('Упражнения не найдены 😧', bot.keyboard.main())
+        bot.user.save_state('/')
+        return
+    exercises = [{'id': last_exerciseuse.exercise.id,
+                  'title': last_exerciseuse.exercise.title}
+                 for last_exerciseuse in last_exerciseuses]
+    context = {'exercises': exercises}
+    message_text = render_to_string('favorite_exercises.html', context=context)
+    bot.send_message(message_text, bot.keyboard.last_exercises(exercises))
+    bot.user.save_state()

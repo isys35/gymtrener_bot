@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from django.test import TestCase
 from django.utils.safestring import SafeString
 
-from telegram_bot.views import welcome, select_category, select_exercise, favorite_exercises
+from telegram_bot.views import welcome, select_category, select_exercise, favorite_exercises, last_exercises
 from tests.conftest import BotMock
-from webhook.models import Category, Exersice, FavoritedExercises, TelegramUser
+from webhook.models import Category, Exersice, FavoritedExercises, TelegramUser, ExerciseUse
 
 
 class WelcomeTest(TestCase):
@@ -76,3 +78,30 @@ class SelectFavoriteExerciseTest(TestCase):
 
         favorite_exercises(self.bot)
         self.assertEqual('/избранные упражнения/1', self.bot.user.state)
+
+
+class SelectLastExerciseTest(TestCase):
+
+    def setUp(self):
+        self.tg_user = TelegramUser(id=123,
+                                    first_name='dasdasdas',
+                                    last_name='dasdasdasd',
+                                    username='dasdasd')
+        self.tg_user.save()
+        self.bot = BotMock()
+        self.bot.user.id = self.tg_user.id
+        self.bot.user.request = 'последние упражнения'
+        self.category = Category(title='Грудь')
+        self.category.save()
+        self.exercise = Exersice(title='Упражнение', category=self.category)
+        self.exercise.save()
+
+    def test_select_exercise(self):
+        last_exercises(self.bot)
+        self.assertEqual('/', self.bot.user.state)
+
+        exercise_use = ExerciseUse(exercise_id=self.exercise.id, user_id=self.tg_user.id, date_finish=datetime.now())
+        exercise_use.save()
+
+        last_exercises(self.bot)
+        self.assertEqual('/последние упражнения', self.bot.user.state)
