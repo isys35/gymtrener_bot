@@ -22,7 +22,8 @@ urls = [
     (r'/exercise_use/<str:exercise_id>/<str:exercise_use_id>/продолжить/<str:mass>/<str:repeat>', save_set),
 
     (r'/избранные упражнения', favorite_exercises),
-    # (r'/выбрать упражнение/<str:category>/', exercise_info)
+    (r'/избранные упражнения/<str:exercise_id>', exercise_info),
 
-    (r'/последние упражнения', last_exercises)
+    (r'/последние упражнения', last_exercises),
+    (r'/последние упражнения/<str:exercise_id>', exercise_info)
     ]

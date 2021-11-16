@@ -2,7 +2,7 @@
 {{ exercise.description }}
 {% if count_exercise_use %}Кол-во тренировок: {{ count_exercise_use }} {% endif %}
 
-{% if last_exercise_use %}Последняя тренировка {{ last_exercise_use.date_start }}
+{% if last_exercise_use %}Последняя тренировка {{ last_exercise_use.date_start|date:"d.m.Y"  }}
 {% for set in sets %}{% if set.repeat %}{{ set.mass }}x{{ set.repeat }} {% endif %}{% endfor %}
 {% endif %}
 

@@ -55,7 +55,7 @@ class BotKeyboard(State):
         """
         self.row('💪🏻 Выбрать упражнение')
         self.row('⭐️ Избранные упражнения')
-        self.row('Последние упражнения')
+        self.row('↪️Последние упражнения')
 
     @keyboard
     def categories(self, categories_list):
@@ -95,7 +95,7 @@ class BotKeyboard(State):
 
     @keyboard
     def exercise(self, favorited=False):
-        self.row('Выполнить упражнение')
+        self.row('💪🏻 Выполнить упражнение 💪🏻')
         if not favorited:
             self.row('Добавить в избранное ⭐️')
         else:
@@ -110,13 +110,3 @@ class BotKeyboard(State):
 
     def clear_keyboard(self):
         return ReplyKeyboardRemove()
-
-
-    # def exercises(self, exersices) -> types.InlineKeyboardMarkup:
-    #     markup = types.InlineKeyboardMarkup()
-    #     btn_list = []
-    #     for exersice in exersices:
-    #         btn = types.InlineKeyboardButton(text=exersice.id, callback_data=exersice.id)
-    #         btn_list.append(btn)
-    #     markup.add(*btn_list)
-    #     return markup

@@ -56,7 +56,7 @@ def exercise_info(bot: Bot, **kwargs):
     except ValueError:
         bot.send_message('Неверно введён индекс упражнения 😧')
         return
-    exercise = Exersice.objects.get(id=exercise_id).select_related('category')
+    exercise = Exersice.objects.filter(id=exercise_id).select_related('category').first()
     favorited_exrcise = FavoritedExercises.objects.filter(user_id=bot.user.id, exercise_id=exercise_id)
     exercise_uses = ExerciseUse.objects.filter(
         user_id=bot.user.id, exercise_id=exercise_id
@@ -115,7 +115,7 @@ def close_exercise(bot: Bot, exercise_id: str, exercise_use_id: str):
 
 
 def input_mass(bot: Bot, exercise_id: str, exercise_use_id: str):
-    text = 'Введите массу'
+    text = 'Введите массу утяжелителя'
     bot.send_message(text, bot.keyboard.clear_keyboard())
     bot.user.save_state()
 
@@ -196,15 +196,16 @@ def last_exercises(bot: Bot, **kwargs):
                             .filter(user_id=user_id) \
                             .distinct('exercise_id') \
                             .order_by('exercise_id', '-date_finish') \
-                            .select_related('exercise')[:5]
+                            .select_related('exercise')[:10]
     if not last_exerciseuses:
         bot.send_message('Упражнения не найдены 😧', bot.keyboard.main())
         bot.user.save_state('/')
         return
     exercises = [{'id': last_exerciseuse.exercise.id,
-                  'title': last_exerciseuse.exercise.title}
+                  'title': last_exerciseuse.exercise.title,
+                  'date': last_exerciseuse.date_finish}
                  for last_exerciseuse in last_exerciseuses]
     context = {'exercises': exercises}
-    message_text = render_to_string('favorite_exercises.html', context=context)
+    message_text = render_to_string('last_exercises.html', context=context)
     bot.send_message(message_text, bot.keyboard.last_exercises(exercises))
     bot.user.save_state()

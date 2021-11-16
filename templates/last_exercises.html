@@ -1,4 +1,4 @@
-Последние упражнения
+↪️ Последние упражнения
 Выберите упражнение для выполнения:
 {% for exersice in exercises %}
-{{ exersice.id }} - {{ exersice.title }}{% endfor %}
+    {{ exersice.id }} - {{ exersice.title }} <b>{{ exersice.date|date:"d.m.Y" }}</b>{% endfor %}
