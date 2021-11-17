@@ -25,7 +25,7 @@ def select_category(bot: Bot, **kwargs):
     bot.user.save_state("/выбрать упражнение")
 
 
-def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
+def select_exercise(bot: Bot, category: str, **kwargs):
     page_number = kwargs.get('page_number') or 1
     page_number = int(page_number)
     exersices = Exersice.objects.filter(category__title=category).order_by('id')
@@ -42,12 +42,12 @@ def select_exercise(bot: Bot, category: str, page_number=None, **kwargs):
 
 def next_page_exercise(bot: Bot, category: str, page_number):
     page = int(page_number) + 1
-    select_exercise(bot, category, page)
+    select_exercise(bot, category, page_number=page)
 
 
 def previos_page_exercis(bot: Bot, category: str, page_number):
     page = int(page_number) - 1
-    select_exercise(bot, category, page)
+    select_exercise(bot, category, page_number=page)
 
 
 def exercise_info(bot: Bot, **kwargs):
@@ -107,11 +107,13 @@ def exercise_use(bot: Bot, **kwargs):
 
 @save_state("/")
 def close_exercise(bot: Bot, exercise_id: str, exercise_use_id: str):
-    exercise_use_obj = ExerciseUse.objects.get(id=int(exercise_use_id))
+    exercise_use_obj = ExerciseUse.objects.filter(id=int(exercise_use_id)).prefetch_related('sets').first()
     exercise_use_obj.date_finish = datetime.now()
     exercise_use_obj.save()
-    text = 'Вы завершили упражнение, вот статистика бла бла бла'
-    bot.send_message(text, bot.keyboard.main())
+    sets = [_set for _set in exercise_use_obj.sets.all() if _set.repeat]
+    context = {'sets': sets, 'sets_count': len(sets)}
+    message = render_to_string('close_exercise.html', context=context)
+    bot.send_message(message, bot.keyboard.main())
 
 
 def input_mass(bot: Bot, exercise_id: str, exercise_use_id: str):
