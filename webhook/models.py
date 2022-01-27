@@ -5,7 +5,7 @@ class TelegramUser(models.Model):
     first_name = models.CharField(max_length=100, db_index=True)
     last_name = models.CharField(max_length=100, db_index=True, blank=True, null=True, default=None)
     username = models.CharField(max_length=100, db_index=True, default=None)
-    state = models.CharField(max_length=200, default='/')
+    state = models.ForeignKey('State', on_delete=models.SET_NULL, blank=True, null=True, default=None)
     favorite_exercises = models.ManyToManyField('Exersice', through='FavoritedExercises')
 
 
@@ -76,3 +76,14 @@ class Set(models.Model):
     count_index = models.IntegerField(default=1)
     repeat = models.IntegerField(default=0)
     mass = models.IntegerField(default=0)
+
+
+class View(models.Model):
+    text = models.TextField()
+    function = models.CharField(max_length=250, blank=True, null=True)
+
+
+class State(models.Model):
+    parent = models.ForeignKey('State', null=True, blank=True, on_delete=models.CASCADE)
+    text = models.CharField(max_length=200, null=True, blank=True)
+    view = models.ForeignKey(View, on_delete=models.CASCADE, related_name='states', null=True, blank=True)

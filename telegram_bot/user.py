@@ -16,10 +16,10 @@ def initialized(method):
 class User:
     id = None
     update = None
-    full_request = None
-    request = None
-    state = '/'
-    callback = None
+    type_request: str = None
+    request: str = None
+    state_id: int = None
+    callback: str = None
 
     def __init__(self, update: UpdateSerializer):
         self.update = update
@@ -44,15 +44,10 @@ class User:
         if self.update_handler.type == "message":
             reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
             self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
+            self.type_request = 'message'
         elif self.update_handler.type == "callback":
-            self.request = 'callback'
+            self.type_request = 'callback'
             self.callback = self.update_handler.get_callback()
-        if self.request == '':
-            self.full_request = self.state
-        elif self.state == '/':
-            self.full_request = self.state + self.request
-        else:
-            self.full_request = f"{self.state}/{self.request}"
 
     @initialized
     def init_from_update(self):
@@ -66,13 +61,14 @@ class User:
         if tg_user:
             tg_user = tg_user.first()
             self.id = tg_user.id
-            self.state = tg_user.state
+            if tg_user.state:
+                self.state_id = tg_user.state_id
             self._init_request()
             self.save_message()
             self.initialized = True
 
     def save(self):
-        TelegramUser.objects.update(id=self.id, state=self.state)
+        TelegramUser.objects.update(id=self.id, state_id=self.state_id)
 
     def save_state(self, new_state=None):
         if new_state is None:
