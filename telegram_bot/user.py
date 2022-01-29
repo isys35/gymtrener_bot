@@ -1,7 +1,8 @@
 import re
+from typing import Optional
 
 from telegram_bot.handlers.handlers import UpdateHandler
-from webhook.models import TelegramUser, TelegramMessage
+from webhook.models import TelegramUser, TelegramMessage, State
 from webhook.serializers import UpdateSerializer
 
 
@@ -17,9 +18,9 @@ class User:
     id = None
     update = None
     type_request: str = None
-    request: str = None
-    state_id: int = None
-    callback: str = None
+    request: Optional[str] = None
+    state_id: Optional[int] = None
+    callback: Optional[str] = None
 
     def __init__(self, update: UpdateSerializer):
         self.update = update
@@ -42,8 +43,9 @@ class User:
 
     def _init_request(self):
         if self.update_handler.type == "message":
-            reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
-            self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
+            # reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
+            # self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
+            self.request = self.update_handler.get_text()
             self.type_request = 'message'
         elif self.update_handler.type == "callback":
             self.type_request = 'callback'
@@ -70,12 +72,17 @@ class User:
     def save(self):
         TelegramUser.objects.update(id=self.id, state_id=self.state_id)
 
-    def save_state(self, new_state=None):
-        if new_state is None:
-            if self.state == '/':
-                self.state = self.state + self.request
-            else:
-                self.state = self.state + '/' + self.request
+    def save_state(self, text_state: Optional[str] = None, blank=False):
+        if blank:
+            self.state_id = None
+            self.save()
+            return
+        if not text_state:
+            text_state = self.request
+        state = State.objects.filter(parent_id=self.state_id, text=text_state).first()
+        if state:
+            self.state_id = state.id
         else:
-            self.state = new_state
+            state = State.objects.create(parent_id=self.state_id, text=text_state)
+            state.save()
         self.save()

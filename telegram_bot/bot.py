@@ -63,4 +63,4 @@ class Bot:
     def error_404(self):
         text_message = 'Неизвестная комманда 😧...'
         self.send_message(text_message, self.keyboard.main())
-        self.user.save_state('/')
+        self.user.save_state(blank=True)
