@@ -1,4 +1,5 @@
 from django.template import Template, Context
+from . import views
 
 from telegram_bot.bot import Bot
 from webhook.models import View
@@ -17,7 +18,11 @@ class ViewDispatcher:
     def as_view(self):
         context = {'update': self.bot.update.data}
         text_message = Template(self.text).render(Context(context))
-        if not self.view.function:
+        if not self.function:
             self.bot.send_message(text_message, self.keyboard)
+        else:
+            if self.function in dir(views):
+                func = eval('views.' + self.function)
+                func(self)
         if self.new_state:
-            self.bot.user.save_state(new_state=self.new_state)
+            self.bot.user.state.new(self.new_state)

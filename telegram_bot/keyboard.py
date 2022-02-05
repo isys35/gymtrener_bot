@@ -1,7 +1,7 @@
 from typing import List
 
 from django.core.paginator import Page
-from telebot.types import ReplyKeyboardRemove
+from telebot.types import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from webhook.models import Keyboard
 
 
@@ -54,16 +54,6 @@ class BotKeyboard(State):
             return
         for button in keyboard.buttons.all():
             self.row(button.text)
-
-    @keyboard
-    def main(self) -> None:
-        """
-        Функция генерации клавиатуры главного меню.
-        :return: None
-        """
-        self.row('💪🏻 Выбрать упражнение')
-        self.row('⭐️ Избранные упражнения')
-        self.row('↪️Последние упражнения')
 
     @keyboard
     def categories(self, categories_list):

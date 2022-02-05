@@ -6,7 +6,7 @@ from webhook.models import TelegramUser, TelegramMessage, State
 from webhook.serializers import UpdateSerializer
 
 
-def initialized(method):
+def initialize(method):
     def decorator(self, *args):
         method(self, *args)
         self.initialized = True
@@ -14,18 +14,44 @@ def initialized(method):
     return decorator
 
 
+class UserState:
+    state_id: Optional[int] = None
+
+    def __init__(self, user: 'User'):
+        self.user = user
+
+    def new(self, state: State):
+        self.state_id = state.id
+        self.user.save()
+
+    def clear(self):
+        self.state_id = None
+        self.user.save()
+
+    def translate_to(self, text_state: Optional[str] = None):
+        if not text_state:
+            text_state = self.user.request
+        state = State.objects.filter(parent_id=self.state_id, text=text_state).first()
+        if state:
+            self.state_id = state.id
+        else:
+            state = State.objects.create(parent_id=self.state_id, text=text_state)
+            state.save()
+        self.user.save()
+
+
 class User:
     id = None
     update = None
     type_request: str = None
     request: Optional[str] = None
-    state_id: Optional[int] = None
+    initialized: bool = False
     callback: Optional[str] = None
 
     def __init__(self, update: UpdateSerializer):
         self.update = update
         self.update_handler = UpdateHandler(update)
-        self.initialized = False
+        self.state = UserState(self)
 
     def save_message(self):
         if self.update_handler.type == "message":
@@ -51,7 +77,7 @@ class User:
             self.type_request = 'callback'
             self.callback = self.update_handler.get_callback()
 
-    @initialized
+    @initialize
     def init_from_update(self):
         self.id = self.update_handler.get_user_id()
         self._init_request()
@@ -64,29 +90,10 @@ class User:
             tg_user = tg_user.first()
             self.id = tg_user.id
             if tg_user.state:
-                self.state_id = tg_user.state_id
+                self.state.state_id = tg_user.state_id
             self._init_request()
             self.save_message()
             self.initialized = True
 
     def save(self):
-        TelegramUser.objects.update(id=self.id, state_id=self.state_id)
-
-    def save_state(self, text_state: Optional[str] = None, new_state: Optional[State] = None, blank=False):
-        if blank:
-            self.state_id = None
-            self.save()
-            return
-        if new_state:
-            self.state_id = new_state.id
-            self.save()
-            return
-        if not text_state:
-            text_state = self.request
-        state = State.objects.filter(parent_id=self.state_id, text=text_state).first()
-        if state:
-            self.state_id = state.id
-        else:
-            state = State.objects.create(parent_id=self.state_id, text=text_state)
-            state.save()
-        self.save()
+        TelegramUser.objects.update(id=self.id, state_id=self.state.state_id)

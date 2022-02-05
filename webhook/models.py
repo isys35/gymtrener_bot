@@ -88,10 +88,11 @@ class View(models.Model):
 class State(models.Model):
     parent = models.ForeignKey('State', null=True, blank=True, on_delete=models.CASCADE)
     text = models.CharField(max_length=200, null=True, blank=True)
+    button = models.ForeignKey('ReplyButton', null=True, blank=True, on_delete=models.SET_NULL)
     view = models.ForeignKey(View, on_delete=models.CASCADE, related_name='states', null=True, blank=True)
 
     def __str__(self):
-        return self.text
+        return self.text or self.button.text
 
 
 class Keyboard(models.Model):
@@ -99,5 +100,8 @@ class Keyboard(models.Model):
 
 
 class ReplyButton(models.Model):
-    keyboard = models.ForeignKey(Keyboard, on_delete=models.CASCADE, related_name='buttons')
+    keyboard = models.ForeignKey(Keyboard,blank=True, null=True,  on_delete=models.CASCADE, related_name='buttons')
     text = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.text

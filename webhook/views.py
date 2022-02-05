@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from telegram_bot.bot import Bot
 from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.router import Router
-from telegram_bot.urls import urls
+# from telegram_bot.urls import urls
 from webhook.serializers import UpdateSerializer
 from webhook.utils import save_json
 
