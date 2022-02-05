@@ -84,15 +84,28 @@ class View(models.Model):
     new_state = models.ForeignKey('State', null=True, blank=True, on_delete=models.SET_NULL, related_name='views')
     keyboard = models.ForeignKey('Keyboard', null=True, blank=True, on_delete=models.SET_NULL, related_name='views')
 
+    def __str__(self):
+        return self.text
+
 
 class State(models.Model):
     parent = models.ForeignKey('State', null=True, blank=True, on_delete=models.CASCADE)
     text = models.CharField(max_length=200, null=True, blank=True)
     button = models.ForeignKey('ReplyButton', null=True, blank=True, on_delete=models.SET_NULL)
+    name_parameter = models.CharField(max_length=200, null=True, blank=True)
     view = models.ForeignKey(View, on_delete=models.CASCADE, related_name='states', null=True, blank=True)
 
     def __str__(self):
         return self.text or self.button.text
+
+
+class StateParameter(models.Model):
+    state = models.ForeignKey('State', on_delete=models.CASCADE)
+    value = models.CharField(max_length=200)
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ['state', 'user']
 
 
 class Keyboard(models.Model):
@@ -100,7 +113,7 @@ class Keyboard(models.Model):
 
 
 class ReplyButton(models.Model):
-    keyboard = models.ForeignKey(Keyboard,blank=True, null=True,  on_delete=models.CASCADE, related_name='buttons')
+    keyboard = models.ForeignKey(Keyboard, blank=True, null=True, on_delete=models.CASCADE, related_name='buttons')
     text = models.CharField(max_length=250)
 
     def __str__(self):

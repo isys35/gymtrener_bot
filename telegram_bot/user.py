@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 from telegram_bot.handlers.handlers import UpdateHandler
-from webhook.models import TelegramUser, TelegramMessage, State
+from webhook.models import TelegramUser, TelegramMessage, State, StateParameter
 from webhook.serializers import UpdateSerializer
 
 
@@ -12,6 +12,24 @@ def initialize(method):
         self.initialized = True
 
     return decorator
+
+
+class UserStateParameter:
+    value: Optional[str] = None
+
+    def __init__(self, state: 'UserState'):
+        self.state = state
+
+    def save(self):
+        state_parameter = StateParameter.objects.filter(state_id=self.state.state_id,
+                                                        user_id=self.state.user.id).first()
+        if state_parameter:
+            state_parameter.value = self.value
+            state_parameter.save()
+            return
+        StateParameter.objects.create(state_id=self.state.state_id,
+                                      user_id=self.state.user.id,
+                                      value=self.value)
 
 
 class UserState:
