@@ -72,9 +72,13 @@ class User:
     def save(self):
         TelegramUser.objects.update(id=self.id, state_id=self.state_id)
 
-    def save_state(self, text_state: Optional[str] = None, blank=False):
+    def save_state(self, text_state: Optional[str] = None, new_state: Optional[State] = None, blank=False):
         if blank:
             self.state_id = None
+            self.save()
+            return
+        if new_state:
+            self.state_id = new_state.id
             self.save()
             return
         if not text_state:

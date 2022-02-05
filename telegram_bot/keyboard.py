@@ -2,6 +2,7 @@ from typing import List
 
 from django.core.paginator import Page
 from telebot.types import ReplyKeyboardRemove
+from webhook.models import Keyboard
 
 
 class State:
@@ -46,6 +47,13 @@ class BotKeyboard(State):
         :return:
         """
         return self.state.get_keyboard(buttons)
+
+    @keyboard
+    def keyboard_from_db(self, keyboard: Keyboard):
+        if not keyboard:
+            return
+        for button in keyboard.buttons.all():
+            self.row(button.text)
 
     @keyboard
     def main(self) -> None:
@@ -101,7 +109,6 @@ class BotKeyboard(State):
         else:
             self.row('Удалить из избранного 🌟️')
         self.row('🔙 Назад', '🏠 Главное меню')
-
 
     @keyboard
     def exercise_use(self):

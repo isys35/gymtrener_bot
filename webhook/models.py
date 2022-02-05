@@ -81,9 +81,23 @@ class Set(models.Model):
 class View(models.Model):
     text = models.TextField()
     function = models.CharField(max_length=250, blank=True, null=True)
+    new_state = models.ForeignKey('State', null=True, blank=True, on_delete=models.SET_NULL, related_name='views')
+    keyboard = models.ForeignKey('Keyboard', null=True, blank=True, on_delete=models.SET_NULL, related_name='views')
 
 
 class State(models.Model):
     parent = models.ForeignKey('State', null=True, blank=True, on_delete=models.CASCADE)
     text = models.CharField(max_length=200, null=True, blank=True)
     view = models.ForeignKey(View, on_delete=models.CASCADE, related_name='states', null=True, blank=True)
+
+    def __str__(self):
+        return self.text
+
+
+class Keyboard(models.Model):
+    pass
+
+
+class ReplyButton(models.Model):
+    keyboard = models.ForeignKey(Keyboard, on_delete=models.CASCADE, related_name='buttons')
+    text = models.CharField(max_length=250)

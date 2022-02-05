@@ -9,8 +9,11 @@ class Router:
 
     @staticmethod
     def dispatcher(bot: Bot):
-        if not bot.user.state_id:
-            state = State.objects.filter(text=bot.user.request, parent=None).first()
+        state = State.objects.filter(text=bot.user.request, parent=None).first()
+        if state and state.view:
+            return ViewDispatcher(bot, state.view).as_view()
+        else:
+            state = State.objects.filter(text=bot.user.request, parent_id=bot.user.state_id).first()
             if state and state.view:
                 return ViewDispatcher(bot, state.view).as_view()
         bot.error_404()
