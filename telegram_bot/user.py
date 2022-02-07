@@ -37,6 +37,7 @@ class UserState:
 
     def __init__(self, user: 'User'):
         self.user = user
+        self.parameter = UserStateParameter(self)
 
     def new(self, state: State):
         self.state_id = state.id  # type: ignore
@@ -46,15 +47,17 @@ class UserState:
         self.state_id = None
         self.user.save()
 
-    def translate_to(self, text_state: Optional[str] = None):
-        if not text_state:
+    def translate_to(self, state: Optional[State] = None):
+        if not state:
             text_state = self.user.request
-        state = State.objects.filter(parent_id=self.state_id, text=text_state).first()
-        if state:
-            self.state_id = state.id
+            state_db = State.objects.filter(parent_id=self.state_id, text=text_state).first()
+            if state_db:
+                self.state_id = state.id
+            else:
+                state_db = State.objects.create(parent_id=self.state_id, text=text_state)
+                state_db.save()
         else:
-            state = State.objects.create(parent_id=self.state_id, text=text_state)
-            state.save()
+            self.state_id = state.id
         self.user.save()
 
 
@@ -90,6 +93,7 @@ class User:
             # reg = re.compile("""[^a-zA-Zа-яА-Я";#().,0-9«»-]""")
             # self.request = reg.sub(' ', self.update_handler.get_text()).strip().lower()
             self.request = self.update_handler.get_text()
+            self.state.parameter.value = self.request
             self.type_request = 'message'
         elif self.update_handler.type == "callback":
             self.type_request = 'callback'

@@ -22,6 +22,6 @@ class Router:
         state = State.objects.filter(parent_id=bot.user.state.state_id).exclude(name_parameter__isnull=True).first()
         if state and state.view:
             view_dispatcher = ViewDispatcher(bot, state.view)
-            view_dispatcher.save_param(state.name_param)
+            view_dispatcher.save_param()
             return view_dispatcher.as_view()
         bot.error_404()

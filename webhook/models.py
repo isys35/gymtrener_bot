@@ -1,6 +1,7 @@
+from typing import Union
+
 from django.db import models
-from django.db.models import CharField, IntegerField, ForeignKey, ManyToManyField, DateTimeField, TextField, ImageField, \
-    URLField
+from django.db.models import CharField, IntegerField, ForeignKey, ManyToManyField, DateTimeField, TextField
 
 
 class TelegramUser(models.Model):
@@ -8,7 +9,7 @@ class TelegramUser(models.Model):
     last_name: CharField = CharField(max_length=100, db_index=True, blank=True, null=True, default=None)
     username: CharField = CharField(max_length=100, db_index=True, default=None)
     state: ForeignKey = ForeignKey('State', on_delete=models.SET_NULL, blank=True, null=True,
-                                default=None)
+                                   default=None)
     favorite_exercises: ManyToManyField = models.ManyToManyField('Exersice', through='FavoritedExercises')
 
 
@@ -76,18 +77,23 @@ class Set(models.Model):
 
 
 class View(models.Model):
-    text: TextField = TextField()
-    function: CharField = CharField(max_length=250, blank=True, null=True)
-    new_state: ForeignKey = ForeignKey('State',
-                                           null=True,
-                                           blank=True,
-                                           on_delete=models.SET_NULL,
-                                           related_name='views')
+    text: Union[TextField, str] = TextField()
+    function: Union[CharField, str] = CharField(max_length=250, blank=True, null=True)
+    new_state: Union[ForeignKey, 'State'] = ForeignKey('State',
+                                                       null=True,
+                                                       blank=True,
+                                                       on_delete=models.SET_NULL,
+                                                       related_name='views_new')
+    translate_state_to: Union[ForeignKey, 'State'] = ForeignKey('State',
+                                                                null=True,
+                                                                blank=True,
+                                                                on_delete=models.SET_NULL,
+                                                                related_name='views_traslated')
     keyboard: ForeignKey = ForeignKey('Keyboard',
-                                             null=True,
-                                             blank=True,
-                                             related_name='views',
-                                             on_delete=models.SET_NULL)
+                                      null=True,
+                                      blank=True,
+                                      related_name='views',
+                                      on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.text
@@ -101,13 +107,13 @@ class State(models.Model):
     view: ForeignKey = ForeignKey(View, on_delete=models.CASCADE, related_name='states', null=True, blank=True)
 
     def __str__(self):
-        return self.text or self.button.text
+        return f"id:{self.id} text:{self.text} button:{self.button} name_parameter:{self.name_parameter}"
 
 
 class StateParameter(models.Model):
     state: ForeignKey = ForeignKey('State', on_delete=models.CASCADE)
     value: CharField = CharField(max_length=200)
-    user: ForeignKey= ForeignKey(TelegramUser, on_delete=models.CASCADE)
+    user: ForeignKey = ForeignKey(TelegramUser, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ['state', 'user']
@@ -119,7 +125,7 @@ class Keyboard(models.Model):
 
 class ReplyButton(models.Model):
     keyboard: ForeignKey = ForeignKey(Keyboard, blank=True, null=True, on_delete=models.CASCADE,
-                                           related_name='buttons')
+                                      related_name='buttons')
     text: CharField = CharField(max_length=250)
 
     def __str__(self):
