@@ -1,22 +1,20 @@
 from io import BufferedReader
 from typing import Union, Optional
 from django.core.files.base import File
-import telebot
-from telebot.types import Message
+import telebot  # type: ignore
 
 from telegram_bot.user import User
 from webhook.serializers import UpdateSerializer
 
 
 class TelegramContext:
-    bot = None
 
     def __init__(self, token: str):
         """
         Инициализирует telebot.TeleBot(token)
         :param token: токен бота в Telegram
         """
-        self.bot = telebot.TeleBot(token, threaded=False)
+        self.bot: telebot.TeleBot = telebot.TeleBot(token, threaded=False)
 
     @staticmethod
     def get_keyboard(buttons: list) -> telebot.types.ReplyKeyboardMarkup:
@@ -35,7 +33,7 @@ class TelegramContext:
     def send_message(self,
                      receiver: int,
                      text: str,
-                     markup: telebot.types.ReplyKeyboardMarkup = None) -> Message:
+                     markup: telebot.types.ReplyKeyboardMarkup = None) -> telebot.types.Message:
         """
         Отправляет сообщение пользователю в Telegram.
         :param receiver: id пользователя в Telegram
@@ -57,7 +55,7 @@ class TelegramContext:
     def send_photo(self, receiver: int,
                    photo: Union[File, BufferedReader],
                    caption: str,
-                   markup: telebot.types.ReplyKeyboardMarkup = None) -> Message:
+                   markup: telebot.types.ReplyKeyboardMarkup = None) -> telebot.types.Message:
         kwargs = {
             'chat_id': receiver,
             'photo': photo,

@@ -31,8 +31,8 @@ class UpdateMockMessage:
 class BotMock:
     keyboard = BotKeyboard(TelegramContext('token'))
     text_message = None
-    user = User(UpdateMockMessage())
-    user.state = "/"
+    user = User(UpdateMockMessage())  # type: ignore
+    user.state = "/"  # type: ignore
 
     def send_message(self, text, keyboard):
         self.text_message = text

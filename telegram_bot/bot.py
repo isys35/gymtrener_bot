@@ -2,6 +2,7 @@ from typing import Optional
 
 from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.keyboard import BotKeyboard
+from telegram_bot.user import User
 from webhook.serializers import UpdateSerializer
 from django.core.files.base import File
 
@@ -32,15 +33,12 @@ def save_state(state: str = '/'):
 
 
 class Bot:
-    context = None
-    user = None
-    update = None
 
     def __init__(self, context: TelegramContext, update: UpdateSerializer):
         self.context = context
         self.keyboard = BotKeyboard(context)
         self.update = update
-        self.user = self.context.get_user(update)
+        self.user: User = self.context.get_user(update)
 
     def send_message(self, text: str, markup=None):
         return self.context.send_message(self.user.id,
@@ -62,5 +60,5 @@ class Bot:
 
     def error_404(self):
         text_message = 'Неизвестная комманда 😧...'
-        self.send_message(text_message, self.keyboard.main())
-        self.user.save_state(blank=True)
+        self.send_message(text_message, self.keyboard.clear_keyboard())
+        self.user.state.clear()

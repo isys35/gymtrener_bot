@@ -1,7 +1,7 @@
 from typing import List
 
 from django.core.paginator import Page
-from telebot.types import ReplyKeyboardRemove, ReplyKeyboardMarkup
+from telebot.types import ReplyKeyboardRemove, ReplyKeyboardMarkup  # type: ignore
 from webhook.models import Keyboard
 
 
@@ -52,8 +52,9 @@ class BotKeyboard(State):
     def keyboard_from_db(self, keyboard: Keyboard):
         if not keyboard:
             return
-        for button in keyboard.buttons.all():
+        for button in keyboard.buttons.all():  # type: ignore
             self.row(button.text)
+
 
     @keyboard
     def categories(self, categories_list):

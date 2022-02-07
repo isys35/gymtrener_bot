@@ -39,7 +39,7 @@ class UserState:
         self.user = user
 
     def new(self, state: State):
-        self.state_id = state.id
+        self.state_id = state.id  # type: ignore
         self.user.save()
 
     def clear(self):
@@ -59,9 +59,9 @@ class UserState:
 
 
 class User:
-    id = None
+    id: int
     update = None
-    type_request: str = None
+    type_request: Optional[str] = None
     request: Optional[str] = None
     initialized: bool = False
     callback: Optional[str] = None
@@ -103,9 +103,8 @@ class User:
         self.save_message()
 
     def init_from_db(self):
-        tg_user = TelegramUser.objects.filter(id=self.update_handler.get_user_id())
+        tg_user = TelegramUser.objects.filter(id=self.update_handler.get_user_id()).first()
         if tg_user:
-            tg_user = tg_user.first()
             self.id = tg_user.id
             if tg_user.state:
                 self.state.state_id = tg_user.state_id

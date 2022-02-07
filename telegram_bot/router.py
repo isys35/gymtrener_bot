@@ -19,7 +19,7 @@ class Router:
                                      parent_id=bot.user.state.state_id).first()
         if state and state.view:
             return ViewDispatcher(bot, state.view).as_view()
-        state = State.objects.filter(parent_id=bot.user.state.state_id).exclude(name_parameter__isnull=True)
+        state = State.objects.filter(parent_id=bot.user.state.state_id).exclude(name_parameter__isnull=True).first()
         if state and state.view:
             view_dispatcher = ViewDispatcher(bot, state.view)
             view_dispatcher.save_param(state.name_param)

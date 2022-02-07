@@ -1,3 +1,5 @@
+from typing import Union
+
 from telegram_bot.handlers.handler_interface import HandlerInterface
 from webhook.serializers import UpdateSerializer
 
@@ -60,6 +62,7 @@ class UpdateHandler(HandlerInterface):
 
     def __init__(self, update: UpdateSerializer):
         self.update = update
+        self.handler: Union[MessageHandler, CallBackHandler]
         if self.update.data.get('message'):
             self.type = "message"
             self.handler = MessageHandler(update)

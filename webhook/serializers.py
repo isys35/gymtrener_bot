@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import serializers
 
 
@@ -50,7 +52,7 @@ class CallBackQuerySeriaizer(serializers.Serializer):
     user = UserSerializer()
     message = MessageSerializer()
     chat_instance = serializers.IntegerField()
-    data = serializers.CharField()
+    data = serializers.CharField()  # type: ignore
 
     def to_internal_value(self, data):
         if data['from']:
