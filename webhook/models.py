@@ -107,7 +107,7 @@ class State(models.Model):
     view: ForeignKey = ForeignKey(View, on_delete=models.CASCADE, related_name='states', null=True, blank=True)
 
     def __str__(self):
-        return f"id:{self.id} text:{self.text} button:{self.button} name_parameter:{self.name_parameter}"
+        return str(self.id)
 
 
 class StateParameter(models.Model):

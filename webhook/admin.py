@@ -8,7 +8,7 @@ class ExersiceAdmin(admin.ModelAdmin):
 
 
 class StateAdmin(admin.ModelAdmin):
-    list_display = ('id', 'text', 'button', 'parent', 'view_id')
+    list_display = ('id', 'text', 'button', 'name_parameter', 'parent', 'view_id')
 
 
 class ViewAdmin(admin.ModelAdmin):
