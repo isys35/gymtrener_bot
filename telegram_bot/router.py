@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 from django.db.models import Q
 
@@ -10,7 +11,7 @@ from webhook.models import State
 class Router:
 
     @staticmethod
-    def dispatcher(bot: Bot):
+    def dispatcher(bot: Bot) -> Optional[dict]:
         q_query = Q(text=bot.user.request) | Q(button__text=bot.user.request)
         state = State.objects.filter(q_query, parent=None).first()
         if state and state.view:

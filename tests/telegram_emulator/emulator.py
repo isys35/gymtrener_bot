@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-import requests
+
 from django.urls import reverse
+from django.test.client import Client
+from rest_framework.response import Response
 
 from tests.utils import load_mock
 
@@ -8,7 +10,7 @@ from tests.utils import load_mock
 class Command(ABC):
 
     @abstractmethod
-    def execute(self) -> None:
+    def execute(self, client: Client) -> Response:
         pass
 
 
@@ -17,8 +19,8 @@ class SimpleCommand(Command):
     def __init__(self, json_data: dict):
         self.json_data = json_data
 
-    def execute(self, client) -> dict:
-        response = client.post(reverse('bot:webhook'), data=self.json_data)
+    def execute(self, client: Client) -> Response:
+        response = client.post(reverse('bot:webhook'), data=self.json_data, content_type='application/json')
         return response
 
 

@@ -52,7 +52,7 @@ class UserState:
             text_state = self.user.request
             state_db = State.objects.filter(parent_id=self.state_id, text=text_state).first()
             if state_db:
-                self.state_id = state.id
+                self.state_id = state_db.id
             else:
                 state_db = State.objects.create(parent_id=self.state_id, text=text_state)
                 state_db.save()

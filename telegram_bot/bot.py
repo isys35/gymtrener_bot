@@ -1,5 +1,7 @@
 from typing import Optional
 
+from telebot.types import Message
+
 from telegram_bot.core.telegram_context import TelegramContext
 from telegram_bot.keyboard import BotKeyboard
 from telegram_bot.user import User
@@ -40,7 +42,7 @@ class Bot:
         self.update = update
         self.user: User = self.context.get_user(update)
 
-    def send_message(self, text: str, markup=None):
+    def send_message(self, text: str, markup=None) -> Message:
         return self.context.send_message(self.user.id,
                                          text,
                                          markup)
