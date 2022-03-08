@@ -1,10 +1,8 @@
-import re
 from typing import Optional
 
 from django.db.models import Q
 
-from telegram_bot.bot import Bot
-from telegram_bot.views_dispatcher import ViewDispatcher
+from telegram_bot import ViewDispatcher, Bot
 from webhook.models import State
 
 

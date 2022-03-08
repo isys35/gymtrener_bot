@@ -3,7 +3,6 @@ from typing import Optional
 from django.template import Template, Context
 from telebot.types import ReplyKeyboardMarkup, Message
 
-from . import views
 
 from telegram_bot.bot import Bot
 from webhook.models import View, State
@@ -26,10 +25,6 @@ class ViewDispatcher:
         response: Optional[Message] = None
         if not self.function:
             response = self.bot.send_message(text_message, self.keyboard)
-        else:
-            if self.function in dir(views):
-                func = eval('views.' + self.function)
-                response = func(self)
         if self.new_state:
             self.bot.user.state.new(self.new_state)
         elif self.translate_state_to:
