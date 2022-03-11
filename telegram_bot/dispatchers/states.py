@@ -15,7 +15,10 @@ class StateDispatcher:
         self.bot = bot
 
     def _execute_state_view(self, state: State, save_param: bool = False) -> Optional[Response]:
-        if state and state.view:
+        if state and not state.view:
+            self.bot.user.save()
+            return Response({"success": False, "error": "view not found"}, status=status.HTTP_200_OK)
+        elif state:
             view_dispatcher = ViewDispatcher(self.bot, state.view)
             if save_param:
                 view_dispatcher.save_param()

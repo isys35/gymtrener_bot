@@ -51,3 +51,25 @@ class TestViewWithNewState(TestCase):
 
         user = TelegramUser.objects.filter(id=command.json_data["message"]["from"]["id"]).first()
         assert user.state == self.state
+        assert user.state.parent is None
+
+
+class TestViewTranslateToState(TestCase):
+
+    def setUp(self) -> None:
+        self.state = State.objects.create(text='главное меню')
+        view = View.objects.create(text='Добро пожаловать', translate_state_to_id=self.state.id)
+        self.state_2 = State.objects.create(text='restart', view_id=view.id)
+
+    def test_view(self):
+        command = TextSimpleCommand('главное меню')
+        command.execute(self.client)
+        command = TextSimpleCommand('restart')
+        response = command.execute(self.client)
+        assert response.status_code == 200
+        assert response.data['success'] == True
+        assert response.data['response_message']['text'] == 'Добро пожаловать'
+
+        user = TelegramUser.objects.filter(id=command.json_data["message"]["from"]["id"]).first()
+        assert user.state == self.state
+        assert user.state.parent == self.state_2
